@@ -1,310 +1,239 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>PetukFirst — Kitchen Dashboard</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PetukFirst — Kitchen Dashboard (Owner Login + Orders + Menu + Print)</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        :root{
-            --brand-dark:#3b1d02;
-            --brand-accent:#ff7b00;
-            --muted:#8a8a8a;
-            --card-bg:#ffffff;
-            --shadow: 0 8px 30px rgba(59,29,2,0.06);
-        }
-        html,body{
-            height:100%;
-            margin:0;
-            background:linear-gradient(135deg,#fff9f0,#fff4ea);
-            color:var(--brand-dark);
-            -webkit-font-smoothing:antialiased;
-            font-family:'Poppins',sans-serif;
-        }
-        .app{max-width:1100px;margin:28px auto;padding:20px}
-        header{display:flex;justify-content:space-between;align-items:center;gap:12px}
-        h1{margin:0;font-size:20px}
-        .card{background:var(--card-bg);border-radius:12px;padding:16px;box-shadow:var(--shadow);margin-top:18px}
-        .muted{color:var(--muted);font-size:13px}
-        .grid{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start}
-        .order{border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;gap:12px;background:linear-gradient(180deg,#fff,#fff)}
-        .order-info{max-width:66%}
-        .order-items{font-size:13px;color:#444;margin-top:6px}
-        .badge{padding:6px 10px;border-radius:8px;font-weight:600;font-size:13px;display:inline-block}
-        .badge.cooking{background:#fff7e6;color:var(--brand-accent);border:1px solid rgba(255,123,0,0.08)}
-        .badge.ready{background:#eafff0;color:#07833e;border:1px solid rgba(7,131,62,0.06)}
-        .badge.delivered{background:#f0f6ff;color:#0b63d6;border:1px solid rgba(11,99,214,0.06)}
-        .order-meta{font-size:12px;color:var(--muted);margin-top:6px}
-        .menu-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px dashed #eee;gap:12px}
-        .controls button{margin-left:6px}
-        .controls button:disabled {opacity:.5;cursor:not-allowed;}
-        input[type="text"], input[type="number"], select, textarea{width:100%;padding:8px;border-radius:8px;border:1px solid #e6e6e6;font-family:inherit}
-        label{font-size:13px;color:#666}
-        .row{display:flex;gap:8px;align-items:center}
-        .btn{background:var(--brand-accent);color:white;padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
-        .btn.ghost{background:transparent;color:var(--brand-dark);border:1px solid #eee}
-        .btn.small{padding:6px 8px;font-size:13px}
-        .login{max-width:420px;margin:60px auto}
-        .loading{padding:18px;text-align:center;color:var(--muted)}
-        @media(max-width:1000px){.grid{grid-template-columns:1fr}aside{order:2}header{flex-direction:column;align-items:flex-start;gap:8px}}
-        @media(max-width:520px){.app{padding:12px;margin:12px}.btn{width:100%}.row{flex-direction:column;align-items:stretch}}
-        a:focus,button:focus,input:focus{outline:3px solid rgba(107,42,0,0.08);outline-offset:2px;}
-    </style>
+  <style>
+    :root {
+      --brand-dark: #3b1d02;
+      --brand-accent: #ff7b00;
+      --muted: #f5f5f5;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg,#fff9f0,#fff4ea);
+      color: var(--brand-dark);
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(59,29,2,0.06);
+    }
+    .muted { color: #777; }
+    .btn {
+      background: var(--brand-accent);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .btn.ghost {
+      background: transparent;
+      color: var(--brand-dark);
+      border: 1px solid #eee;
+    }
+    .input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    .tag {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #fff7e6;
+      color: var(--brand-accent);
+      font-weight: 600;
+    }
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      padding: 8px 0;
+    }
+  </style>
 </head>
 <body>
-    <div id="app-root"></div>
+  <div class="max-w-5xl mx-auto p-6">
+    <header class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">PetukFirst Kitchen</h1>
+        <div class="muted">Owner / Editor Dashboard — Manage Menu & Orders</div>
+      </div>
+      <div id="auth-panel"></div>
+    </header>
 
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-        import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, getDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+    <main id="app-root"></main>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDTI5qygfRfvIS9lKPzHGqg3rg-PFgGfPE",
-            authDomain: "petuk-first.firebaseapp.com",
-            projectId: "petuk-first",
-            storageBucket: "petuk-first.appspot.com",
-            messagingSenderId: "272897553563",
-            appId: "1:272897553563:web:3b0966e5e33d083e20023e"
-        };
+    <footer class="mt-10 muted text-sm text-center">
+      Made for PetukFirst — Kitchen Manager
+    </footer>
+  </div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        setPersistence(auth, browserLocalPersistence);
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+    import { 
+      getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut 
+    } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+    import { 
+      getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy 
+    } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        const ORDERS_COLLECTION = 'orders';
-        const MENU_COLLECTION = 'kitchen';
-        const ROLES_COLLECTION = 'roles';
+    const firebaseConfig = {
+      apiKey: "AIzaSyDTI5qygfRfvIS9lKPzHGqg3rg-PFgGfPE",
+      authDomain: "petuk-first.firebaseapp.com",
+      projectId: "petuk-first",
+      storageBucket: "petuk-first.appspot.com",
+      messagingSenderId: "272897553563",
+      appId: "1:272897553563:web:3b0966e5e33d083e20023e"
+    };
 
-        const $id = id => document.getElementById(id);
-        const escapeHtml = s => String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+    const MENU_COLLECTION = 'petuk_menu';
 
-        // Login Screen
-        function renderLogin(){
-            const r=$id('app-root');
-            r.innerHTML=`
-                <div class="card login">
-                    <h2>Kitchen Login</h2>
-                    <p class="muted">Sign in with your staff account</p>
-                    <div><label>Email</label><input id="_email" type="email" placeholder="kitchen@petukfirst.in"></div>
-                    <div style="margin-top:8px"><label>Password</label><input id="_password" type="password" placeholder="••••••"></div>
-                    <div style="margin-top:12px;display:flex;gap:8px"><button id="_signin" class="btn">Sign in</button></div>
-                    <p class="muted" style="margin-top:10px">Only authorized accounts can access this dashboard.</p>
-                </div>`;
-            $id('_signin').addEventListener('click', async()=>{
-                const email=($id('_email').value||'').trim(),pass=($id('_password').value||'').trim();
-                if(!email||!pass)return alert('Please enter email and password');
-                try{await signInWithEmailAndPassword(auth,email,pass);}
-                catch(err){alert('Sign-in failed: '+err.message);}
-            });
-        }
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const $ = id => document.getElementById(id);
 
-        // Dashboard
-        function renderApp(role){
-            const r=$id('app-root');
-            r.innerHTML=`
-                <div class="app">
-                    <header>
-                        <div><h1>PetukFirst Kitchen</h1><div class="muted" id="serverStatus">Connected</div></div>
-                        <div style="display:flex;align-items:center;gap:12px">
-                            <div class="muted" id="userEmail"></div>
-                            <div class="muted" id="userRole"></div>
-                            <button id="signoutBtn" class="btn ghost">Sign out</button>
-                        </div>
-                    </header>
+    // ---------------- Login UI ----------------
+    function renderLoginUI(){
+      $('app-root').innerHTML = `
+        <div class="card max-w-md mx-auto">
+          <h2 class="text-xl font-semibold mb-2">Kitchen Staff Login</h2>
+          <input id="login-email" class="input mb-3" type="email" placeholder="Email">
+          <input id="login-pass" class="input mb-3" type="password" placeholder="Password">
+          <button id="btn-login" class="btn w-full">Sign In</button>
+        </div>
+      `;
+      $('btn-login').onclick = async ()=>{
+        const email = $('login-email').value.trim();
+        const pass = $('login-pass').value.trim();
+        if(!email || !pass) return alert("Enter email and password");
+        try { await signInWithEmailAndPassword(auth, email, pass); }
+        catch(e){ alert(e.message); }
+      }
+    }
 
-                    <div class="grid">
-                        <div>
-                            <div class="card"><h3>Live Orders</h3><div id="ordersList" style="margin-top:12px"><div class="loading">Loading orders…</div></div></div>
-                            <div class="card"><h3>Quick Filters</h3>
-                                <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-                                    <button id="filterAll" class="btn ghost small">All</button>
-                                    <button id="filterCooking" class="btn ghost small">Cooking</button>
-                                    <button id="filterReady" class="btn ghost small">Ready</button>
-                                </div>
-                            </div>
-                        </div>
+    // ---------------- Dashboard ----------------
+    function renderDashboard(user){
+      $('auth-panel').innerHTML = `
+        <div class="text-right">
+          <div class="font-medium">${user.email}</div>
+          <button id="logout" class="btn ghost text-sm mt-1">Logout</button>
+        </div>`;
+      $('logout').onclick = ()=>signOut(auth);
 
-                        <aside>
-                            <div class="card">
-                                <h3>Menu Manager (<span id="menuCount">0</span>)</h3>
-                                <div id="menuList" style="margin-top:10px;max-height:320px;overflow:auto"><div class="loading">Loading menu…</div></div>
-                                <hr style="margin:12px 0">
-                                <h4 id="menuFormTitle">Add / Edit Item</h4>
-                                <div><label>Name</label><input id="itemName" placeholder="Paneer Butter Masala"></div>
-                                <div style="margin-top:8px"><label>Price (₹)</label><input id="itemPrice" type="number" placeholder="199"></div>
-                                <div style="margin-top:8px"><label>Category</label><input id="itemCategory" placeholder="Main / Starter / Drinks"></div>
-                                <div style="margin-top:8px;display:flex;gap:8px">
-                                    <button id="addItem" class="btn">Save Item</button>
-                                    <button id="cancelEdit" class="btn ghost">Cancel</button>
-                                </div>
-                            </div>
-                        </aside>
-                    </div>
-                </div>`;
+      $('app-root').innerHTML = `
+        <div class="grid gap-6 lg:grid-cols-2">
+          <div class="card">
+            <h2 class="text-xl font-semibold mb-4">Menu Manager</h2>
+            <form id="item-form" class="space-y-3">
+              <input type="hidden" id="item-id">
+              <div><label class="muted">Name</label><input id="item-name" class="input" required></div>
+              <div><label class="muted">Category</label>
+                <input id="item-category" class="input" list="cat-list" placeholder="e.g. Rolls, Drinks">
+                <datalist id="cat-list"></datalist>
+              </div>
+              <div><label class="muted">Price (₹)</label><input id="item-price" class="input" type="number" required></div>
+              <button class="btn w-full" type="submit">Save Item</button>
+            </form>
+          </div>
 
-            $id('signoutBtn').onclick=()=>signOut(auth);
-            $id('filterAll').onclick=()=>renderOrders(currentOrders);
-            $id('filterCooking').onclick=()=>renderOrders(currentOrders.filter(o=>o.status?.toLowerCase()==='cooking'));
-            $id('filterReady').onclick=()=>renderOrders(currentOrders.filter(o=>o.status?.toLowerCase()==='ready'));
-            $id('addItem').onclick=handleAddOrEdit;
-            $id('cancelEdit').onclick=()=>{
-                editingItemId=null;clearMenuForm();
-                $id('menuFormTitle').textContent='Add / Edit Item';
-                $id('addItem').textContent='Save Item';
-            };
+          <div class="card">
+            <h2 class="text-xl font-semibold mb-4">Current Menu</h2>
+            <div id="menu-list"></div>
+          </div>
+        </div>
+      `;
+      $('item-form').onsubmit = saveMenuItem;
+      loadMenuItems();
+    }
 
-            setupOrdersListener();
-            setupMenuListener();
-            $id('userRole').textContent='Role: '+role;
-            $id('userEmail').textContent=auth.currentUser?.email||'';
-        }
+    // ---------------- Firestore: Save & Update ----------------
+    async function saveMenuItem(e){
+      e.preventDefault();
+      const id = $('item-id').value;
+      const name = $('item-name').value.trim();
+      const category = $('item-category').value.trim();
+      const price = parseFloat($('item-price').value);
+      if(!name || !category || !price){ alert('Fill all fields'); return; }
 
-        // Orders
-        let currentOrders=[];
-        function setupOrdersListener(){
-            const q=query(collection(db,ORDERS_COLLECTION),orderBy('createdAt','desc'));
-            const listEl=$id('ordersList');
-            listEl.innerHTML='<div class="loading">Loading orders…</div>';
-            currentOrders=[];
-            onSnapshot(q,snapshot=>{
-                $id('serverStatus').textContent='Live';
-                snapshot.docChanges().forEach(change=>{
-                    const data={id:change.doc.id,...change.doc.data()};
-                    if(change.type==="added"){currentOrders.unshift(data);addOrderDOM(data);}
-                    else if(change.type==="modified"){updateOrderDOM(data);}
-                    else if(change.type==="removed"){removeOrderDOM(data.id);}
-                });
-            },()=>{$id('serverStatus').textContent='Offline';});
-        }
+      if(id){ // Update existing
+        await updateDoc(doc(db,MENU_COLLECTION,id), { name, category, price });
+        alert('Updated successfully!');
+      } else { // Add new
+        await addDoc(collection(db,MENU_COLLECTION), { name, category, price });
+        alert('Item added!');
+      }
+      $('item-form').reset();
+    }
 
-        function addOrderDOM(o){
-            const c=$id('ordersList');
-            const div=createOrderDiv(o);
-            c.prepend(div);
-        }
-
-        function updateOrderDOM(o){
-            const existing=$id('order-'+o.id);
-            if(existing){
-                const newDiv=createOrderDiv(o);
-                existing.replaceWith(newDiv);
-            }
-        }
-
-        function removeOrderDOM(id){
-            const el=$id('order-'+id);
-            if(el)el.remove();
-        }
-
-        function createOrderDiv(o){
-            const s=(o.status||'New'),cls=s.toLowerCase();
-            const isDelivered=cls==='delivered';
-            const disabledAttr=isDelivered?'disabled':'';
-            const items=(o.items||[]).map(i=>`${i.qty}x ${escapeHtml(i.name)}`).join('<br>');
-            const t=o.createdAt?.toDate?.().toLocaleString()||'';
-            const div=document.createElement('div');
-            div.className='order';
-            div.id='order-'+o.id;
-            div.innerHTML=`
-                <div class="order-info">
-                    <div style="display:flex;justify-content:space-between"><strong>Order #${o.id.slice(-6)}</strong><small class="muted">${escapeHtml(o.customerName||'Guest')}</small></div>
-                    <div class="order-items">${items}</div><div class="order-meta">${t}</div>
-                </div>
-                <div style="text-align:right">
-                    <div style="margin-bottom:8px"><span class="badge ${cls}">${escapeHtml(s)}</span></div>
-                    <div class="controls" style="display:flex;flex-direction:column;gap:6px;min-width:120px">
-                        <button class="btn small" data-act="cooking" ${disabledAttr}>Set Cooking</button>
-                        <button class="btn small" data-act="ready" ${disabledAttr}>Set Ready</button>
-                        <button class="btn ghost small" data-act="delivered" ${disabledAttr}>Delivered</button>
-                    </div>
-                </div>`;
-            div.querySelectorAll('button').forEach(b=>{
-                if(!b.disabled)b.onclick=()=>updateOrderStatus(o.id,b.dataset.act);
-            });
-            return div;
-        }
-
-        async function updateOrderStatus(id,act){
-            const statusMap={cooking:'Cooking',ready:'Ready',delivered:'Delivered'};
-            await updateDoc(doc(db,ORDERS_COLLECTION,id),{status:statusMap[act],updatedAt:serverTimestamp()});
-        }
-
-        function renderOrders(list){
-            const c=$id('ordersList');
-            if(!list.length){c.innerHTML='<p class="muted">No orders yet</p>';return;}
-            c.innerHTML='';
-            list.forEach(o=>c.appendChild(createOrderDiv(o)));
-        }
-
-        // Menu
-        let editingItemId=null;
-        function setupMenuListener(){
-            const q=query(collection(db,MENU_COLLECTION),orderBy('name'));
-            onSnapshot(q,snap=>{
-                const items=snap.docs.map(d=>({id:d.id,...d.data()}));
-                renderMenu(items);
-            });
-        }
-        function renderMenu(items){
-            const c=$id('menuList');
-            if(!items.length){c.innerHTML='<p class="muted">No menu items</p>';return;}
-            c.innerHTML='';$id('menuCount').textContent=items.length;
-            items.forEach(it=>{
-                const div=document.createElement('div');
-                div.className='menu-item';
-                div.innerHTML=`<div><strong>${escapeHtml(it.name)}</strong><div class="muted">₹${it.price} · ${escapeHtml(it.category||'—')}</div></div>
-                <div><button class="btn ghost small" data-act="edit">Edit</button><button class="btn small" data-act="delete">Delete</button></div>`;
-                div.querySelector('[data-act="edit"]').onclick=()=>{
-                    editingItemId=it.id;
-                    $id('itemName').value=it.name;$id('itemPrice').value=it.price;$id('itemCategory').value=it.category||'';
-                    $id('menuFormTitle').textContent='Edit Item';
-                    $id('addItem').textContent='Update Item';
-                };
-                div.querySelector('[data-act="delete"]').onclick=async()=>{if(confirm('Delete '+it.name+'?'))await deleteDoc(doc(db,MENU_COLLECTION,it.id));};
-                c.appendChild(div);
-            });
-        }
-        function clearMenuForm(){['itemName','itemPrice','itemCategory'].forEach(id=>$id(id).value='');}
-        async function handleAddOrEdit(){
-            const name=$id('itemName').value.trim(),price=+$id('itemPrice').value,category=$id('itemCategory').value.trim();
-            if(!name||!price)return alert('Enter name & price');
-            if(editingItemId){
-                await updateDoc(doc(db,MENU_COLLECTION,editingItemId),{name,price,category,updatedAt:serverTimestamp()});
-                editingItemId=null;
-            } else await addDoc(collection(db,MENU_COLLECTION),{name,price,category,createdAt:serverTimestamp()});
-            clearMenuForm();
-            $id('menuFormTitle').textContent='Add / Edit Item';
-            $id('addItem').textContent='Save Item';
-        }
-
-        // Role Management
-        async function fetchUserRole(uid){
-            const snap=await getDoc(doc(db,ROLES_COLLECTION,uid));
-            return snap.exists()?snap.data().role.toLowerCase():null;
-        }
-
-        onAuthStateChanged(auth,async user=>{
-            if(!user)return renderLogin();
-            let role=null;
-            try{role=await fetchUserRole(user.uid);}
-            catch(error){
-                console.error("Error fetching user role:",error);
-                alert('Could not verify staff role due to a connection error. Please try again.');
-                await signOut(auth);
-                return renderLogin();
-            }
-            if(!role||!['admin','editor'].includes(role)){
-                alert('Access denied: Your account does not have the required staff role.');
-                await signOut(auth);
-                return renderLogin();
-            }
-            renderApp(role);
+    // ---------------- Load & Render Menu ----------------
+    function loadMenuItems(){
+      const q = query(collection(db,MENU_COLLECTION), orderBy('category'));
+      onSnapshot(q, snap=>{
+        const list = $('menu-list');
+        list.innerHTML = '';
+        const cats = new Set();
+        snap.forEach(docSnap=>{
+          const d = docSnap.data();
+          const div = document.createElement('div');
+          div.className = 'menu-item';
+          div.innerHTML = `
+            <div>
+              <div class="font-semibold">${d.name}</div>
+              <div class="text-sm muted">${d.category} • ₹${d.price}</div>
+            </div>
+            <div>
+              <button class="btn ghost text-xs mr-2" data-edit="${docSnap.id}">Edit</button>
+              <button class="btn ghost text-xs text-red-600" data-del="${docSnap.id}">Delete</button>
+            </div>
+          `;
+          list.appendChild(div);
+          cats.add(d.category);
         });
-    </script>
+        // categories datalist
+        const dl = $('cat-list');
+        dl.innerHTML = [...cats].map(c=>`<option value="${c}">`).join('');
+        list.querySelectorAll('[data-edit]').forEach(b=>{
+          b.onclick = ()=>editItem(b.dataset.edit);
+        });
+        list.querySelectorAll('[data-del]').forEach(b=>{
+          b.onclick = ()=>deleteItem(b.dataset.del);
+        });
+      });
+    }
+
+    async function editItem(id){
+      const ref = doc(db,MENU_COLLECTION,id);
+      const snap = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js')
+        .then(m=>m.getDoc(ref));
+      const d = (await snap).data();
+      $('item-id').value = id;
+      $('item-name').value = d.name;
+      $('item-category').value = d.category;
+      $('item-price').value = d.price;
+    }
+
+    async function deleteItem(id){
+      if(confirm('Delete this item?')){
+        await deleteDoc(doc(db,MENU_COLLECTION,id));
+      }
+    }
+
+    // ---------------- Auth State ----------------
+    onAuthStateChanged(auth, user=>{
+      if(user) renderDashboard(user);
+      else renderLoginUI();
+    });
+  </script>
 </body>
 </html>
