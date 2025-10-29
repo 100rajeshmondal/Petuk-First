@@ -92,7 +92,7 @@
       appId: "1:272897553563:web:3b0966e5e33d083e20023e"
     };
 
-    const MENU_COLLECTION = 'petuk_menu';
+    const MENU_COLLECTION = 'menuItems'; // ✅ unified with public website
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -171,14 +171,22 @@
         const imgRef = ref(storage, 'menu_images/' + Date.now() + '_' + file.name);
         await uploadBytes(imgRef, file);
         imgUrl = await getDownloadURL(imgRef);
+      } else if(id) {
+        const existing = await getDoc(doc(db, MENU_COLLECTION, id));
+        imgUrl = existing.data().imageUrl || '';
       }
 
-      const data = { name, desc, category, price };
-      if(imgUrl) data.image = imgUrl;
+      const data = { name, desc, category, price, imageUrl: imgUrl };
 
-      if(id){ await updateDoc(doc(db,MENU_COLLECTION,id), data); alert('Updated!'); }
-      else { await addDoc(collection(db,MENU_COLLECTION), data); alert('Added!'); }
+      if(id){ 
+        await updateDoc(doc(db,MENU_COLLECTION,id), data); 
+        alert('✅ Updated!');
+      } else { 
+        await addDoc(collection(db,MENU_COLLECTION), data); 
+        alert('✅ Added!');
+      }
 
+      $('item-id').value = '';
       $('item-form').reset();
     }
 
@@ -194,7 +202,7 @@
           div.className = 'menu-item';
           div.innerHTML = `
             <div class="flex items-center">
-              ${d.image ? `<img src="${d.image}" class="thumb">` : ''}
+              ${d.imageUrl ? `<img src="${d.imageUrl}" class="thumb">` : ''}
               <div>
                 <div class="font-semibold">${d.name}</div>
                 <div class="text-sm text-gray-600">${d.category} • ₹${d.price}</div>
