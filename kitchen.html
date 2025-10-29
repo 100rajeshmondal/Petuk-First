@@ -32,6 +32,11 @@
       text-align: center;
       cursor: pointer;
     }
+    .btn-outline {
+      background: transparent;
+      color: var(--brand-accent);
+      border: 1px solid var(--brand-accent);
+    }
     .input {
       width: 100%;
       padding: 10px;
@@ -122,7 +127,7 @@
       $('auth-panel').innerHTML = `
         <div class="text-right">
           <div class="font-medium">${user.email}</div>
-          <button id="logout" class="btn bg-transparent text-orange-600 border border-orange-400 mt-1">Logout</button>
+          <button id="logout" class="btn-outline mt-1 px-3 py-1 text-sm">Logout</button>
         </div>`;
       $('logout').onclick = ()=>signOut(auth);
 
@@ -142,7 +147,7 @@
                 <datalist id="cat-list"></datalist>
               </div>
               <div><label class="text-gray-600">Price (₹)</label><input id="item-price" class="input" type="number" required></div>
-              <button class="btn w-full" type="submit">Save Item</button>
+              <button class="btn w-full" id="save-btn" type="submit">Save Item</button>
             </form>
           </div>
 
@@ -168,26 +173,29 @@
       if(!name || !category || !price){ alert('Fill all required fields'); return; }
 
       let imgUrl = '';
-      if(file){
-        const imgRef = ref(storage, 'menu_images/' + Date.now() + '_' + file.name);
-        await uploadBytes(imgRef, file);
-        imgUrl = await getDownloadURL(imgRef);
-      }
-
-      const data = { name, desc, category, price };
-      if(imgUrl) data.image = imgUrl;
-
       try {
+        if(file){
+          const imgRef = ref(storage, 'menu_images/' + Date.now() + '_' + file.name);
+          await uploadBytes(imgRef, file);
+          imgUrl = await getDownloadURL(imgRef);
+        }
+
+        const data = { name, desc, category, price, updatedAt: new Date() };
+        if(imgUrl) data.image = imgUrl;
+
         if(id){
           await updateDoc(doc(db,MENU_COLLECTION,id), data);
-          alert('✅ Updated!');
+          alert('✅ Item updated successfully!');
         } else {
           await addDoc(collection(db,MENU_COLLECTION), data);
-          alert('✅ Added!');
+          alert('✅ New item added!');
         }
+
         $('item-form').reset();
+        $('save-btn').textContent = 'Save Item';
+        $('item-id').value = '';
       } catch (err) {
-        alert('Error saving item: ' + err.message);
+        alert('❌ Error saving item: ' + err.message);
       }
     }
 
@@ -211,8 +219,8 @@
               </div>
             </div>
             <div>
-              <button class="btn bg-transparent text-orange-600 border border-orange-400 text-xs mr-1" data-edit="${docSnap.id}">Edit</button>
-              <button class="btn bg-transparent text-red-600 border border-red-400 text-xs" data-del="${docSnap.id}">Delete</button>
+              <button class="btn-outline text-xs px-2 py-1 mr-1" data-edit="${docSnap.id}">Edit</button>
+              <button class="btn-outline text-red-600 border-red-400 text-xs px-2 py-1" data-del="${docSnap.id}">Delete</button>
             </div>
           `;
           list.appendChild(div);
@@ -232,6 +240,7 @@
       $('item-desc').value = d.desc || '';
       $('item-category').value = d.category;
       $('item-price').value = d.price;
+      $('save-btn').textContent = 'Update Item';
       window.scrollTo({top:0,behavior:'smooth'});
     }
 
