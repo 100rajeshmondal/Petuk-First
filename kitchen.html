@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PetukFirst — Kitchen Dashboard (Owner Login + Orders + Menu + Print)</title>
+  <title>PetukFirst — Kitchen Dashboard (Add / Edit Menu)</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -12,31 +12,25 @@
     :root {
       --brand-dark: #3b1d02;
       --brand-accent: #ff7b00;
-      --muted: #f5f5f5;
     }
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg,#fff9f0,#fff4ea);
+      background: #fff8f1;
       color: var(--brand-dark);
     }
     .card {
       background: white;
       border-radius: 12px;
-      padding: 16px;
+      padding: 20px;
       box-shadow: 0 8px 24px rgba(59,29,2,0.06);
     }
-    .muted { color: #777; }
     .btn {
       background: var(--brand-accent);
       color: #fff;
-      padding: 8px 12px;
+      padding: 10px;
       border-radius: 8px;
+      text-align: center;
       cursor: pointer;
-    }
-    .btn.ghost {
-      background: transparent;
-      color: var(--brand-dark);
-      border: 1px solid #eee;
     }
     .input {
       width: 100%;
@@ -44,36 +38,35 @@
       border-radius: 8px;
       border: 1px solid #ddd;
     }
-    .tag {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: #fff7e6;
-      color: var(--brand-accent);
-      font-weight: 600;
-    }
     .menu-item {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       border-bottom: 1px solid #eee;
       padding: 8px 0;
+    }
+    img.thumb {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-right: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="max-w-5xl mx-auto p-6">
+  <div class="max-w-6xl mx-auto p-6">
     <header class="flex items-center justify-between mb-6">
       <div>
         <h1 class="text-2xl font-bold">PetukFirst Kitchen</h1>
-        <div class="muted">Owner / Editor Dashboard — Manage Menu & Orders</div>
+        <div class="text-gray-600">Owner / Editor Dashboard — Manage Menu</div>
       </div>
       <div id="auth-panel"></div>
     </header>
 
     <main id="app-root"></main>
 
-    <footer class="mt-10 muted text-sm text-center">
+    <footer class="mt-10 text-center text-gray-500 text-sm">
       Made for PetukFirst — Kitchen Manager
     </footer>
   </div>
@@ -84,8 +77,11 @@
       getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut 
     } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
     import { 
-      getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy 
+      getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, getDoc 
     } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+    import { 
+      getStorage, ref, uploadBytes, getDownloadURL 
+    } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyDTI5qygfRfvIS9lKPzHGqg3rg-PFgGfPE",
@@ -97,37 +93,35 @@
     };
 
     const MENU_COLLECTION = 'petuk_menu';
-
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
     const $ = id => document.getElementById(id);
 
-    // ---------------- Login UI ----------------
+    // ---------------- LOGIN ----------------
     function renderLoginUI(){
       $('app-root').innerHTML = `
         <div class="card max-w-md mx-auto">
-          <h2 class="text-xl font-semibold mb-2">Kitchen Staff Login</h2>
+          <h2 class="text-xl font-semibold mb-3">Kitchen Staff Login</h2>
           <input id="login-email" class="input mb-3" type="email" placeholder="Email">
           <input id="login-pass" class="input mb-3" type="password" placeholder="Password">
           <button id="btn-login" class="btn w-full">Sign In</button>
-        </div>
-      `;
+        </div>`;
       $('btn-login').onclick = async ()=>{
         const email = $('login-email').value.trim();
         const pass = $('login-pass').value.trim();
-        if(!email || !pass) return alert("Enter email and password");
-        try { await signInWithEmailAndPassword(auth, email, pass); }
+        try { await signInWithEmailAndPassword(auth,email,pass); }
         catch(e){ alert(e.message); }
-      }
+      };
     }
 
-    // ---------------- Dashboard ----------------
+    // ---------------- DASHBOARD ----------------
     function renderDashboard(user){
       $('auth-panel').innerHTML = `
         <div class="text-right">
           <div class="font-medium">${user.email}</div>
-          <button id="logout" class="btn ghost text-sm mt-1">Logout</button>
+          <button id="logout" class="btn bg-transparent text-orange-600 border border-orange-400 mt-1">Logout</button>
         </div>`;
       $('logout').onclick = ()=>signOut(auth);
 
@@ -137,12 +131,16 @@
             <h2 class="text-xl font-semibold mb-4">Menu Manager</h2>
             <form id="item-form" class="space-y-3">
               <input type="hidden" id="item-id">
-              <div><label class="muted">Name</label><input id="item-name" class="input" required></div>
-              <div><label class="muted">Category</label>
+              <div><label class="text-gray-600">Picture</label>
+                <input id="item-image" type="file" accept="image/*" class="input">
+              </div>
+              <div><label class="text-gray-600">Name</label><input id="item-name" class="input" required></div>
+              <div><label class="text-gray-600">Description</label><textarea id="item-desc" class="input" rows="2"></textarea></div>
+              <div><label class="text-gray-600">Category</label>
                 <input id="item-category" class="input" list="cat-list" placeholder="e.g. Rolls, Drinks">
                 <datalist id="cat-list"></datalist>
               </div>
-              <div><label class="muted">Price (₹)</label><input id="item-price" class="input" type="number" required></div>
+              <div><label class="text-gray-600">Price (₹)</label><input id="item-price" class="input" type="number" required></div>
               <button class="btn w-full" type="submit">Save Item</button>
             </form>
           </div>
@@ -157,26 +155,33 @@
       loadMenuItems();
     }
 
-    // ---------------- Firestore: Save & Update ----------------
+    // ---------------- FIRESTORE FUNCTIONS ----------------
     async function saveMenuItem(e){
       e.preventDefault();
       const id = $('item-id').value;
       const name = $('item-name').value.trim();
+      const desc = $('item-desc').value.trim();
       const category = $('item-category').value.trim();
       const price = parseFloat($('item-price').value);
-      if(!name || !category || !price){ alert('Fill all fields'); return; }
+      const file = $('item-image').files[0];
+      if(!name || !category || !price){ alert('Fill all required fields'); return; }
 
-      if(id){ // Update existing
-        await updateDoc(doc(db,MENU_COLLECTION,id), { name, category, price });
-        alert('Updated successfully!');
-      } else { // Add new
-        await addDoc(collection(db,MENU_COLLECTION), { name, category, price });
-        alert('Item added!');
+      let imgUrl = '';
+      if(file){
+        const imgRef = ref(storage, 'menu_images/' + Date.now() + '_' + file.name);
+        await uploadBytes(imgRef, file);
+        imgUrl = await getDownloadURL(imgRef);
       }
+
+      const data = { name, desc, category, price };
+      if(imgUrl) data.image = imgUrl;
+
+      if(id){ await updateDoc(doc(db,MENU_COLLECTION,id), data); alert('Updated!'); }
+      else { await addDoc(collection(db,MENU_COLLECTION), data); alert('Added!'); }
+
       $('item-form').reset();
     }
 
-    // ---------------- Load & Render Menu ----------------
     function loadMenuItems(){
       const q = query(collection(db,MENU_COLLECTION), orderBy('category'));
       onSnapshot(q, snap=>{
@@ -188,48 +193,44 @@
           const div = document.createElement('div');
           div.className = 'menu-item';
           div.innerHTML = `
-            <div>
-              <div class="font-semibold">${d.name}</div>
-              <div class="text-sm muted">${d.category} • ₹${d.price}</div>
+            <div class="flex items-center">
+              ${d.image ? `<img src="${d.image}" class="thumb">` : ''}
+              <div>
+                <div class="font-semibold">${d.name}</div>
+                <div class="text-sm text-gray-600">${d.category} • ₹${d.price}</div>
+                ${d.desc ? `<div class="text-xs text-gray-500">${d.desc}</div>` : ''}
+              </div>
             </div>
             <div>
-              <button class="btn ghost text-xs mr-2" data-edit="${docSnap.id}">Edit</button>
-              <button class="btn ghost text-xs text-red-600" data-del="${docSnap.id}">Delete</button>
+              <button class="btn bg-transparent text-orange-600 border border-orange-400 text-xs mr-1" data-edit="${docSnap.id}">Edit</button>
+              <button class="btn bg-transparent text-red-600 border border-red-400 text-xs" data-del="${docSnap.id}">Delete</button>
             </div>
           `;
           list.appendChild(div);
           cats.add(d.category);
         });
-        // categories datalist
-        const dl = $('cat-list');
-        dl.innerHTML = [...cats].map(c=>`<option value="${c}">`).join('');
-        list.querySelectorAll('[data-edit]').forEach(b=>{
-          b.onclick = ()=>editItem(b.dataset.edit);
-        });
-        list.querySelectorAll('[data-del]').forEach(b=>{
-          b.onclick = ()=>deleteItem(b.dataset.del);
-        });
+        $('cat-list').innerHTML = [...cats].map(c=>`<option value="${c}">`).join('');
+        list.querySelectorAll('[data-edit]').forEach(b=> b.onclick = ()=>editItem(b.dataset.edit));
+        list.querySelectorAll('[data-del]').forEach(b=> b.onclick = ()=>deleteItem(b.dataset.del));
       });
     }
 
     async function editItem(id){
-      const ref = doc(db,MENU_COLLECTION,id);
-      const snap = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js')
-        .then(m=>m.getDoc(ref));
-      const d = (await snap).data();
+      const snap = await getDoc(doc(db,MENU_COLLECTION,id));
+      const d = snap.data();
       $('item-id').value = id;
       $('item-name').value = d.name;
+      $('item-desc').value = d.desc || '';
       $('item-category').value = d.category;
       $('item-price').value = d.price;
+      window.scrollTo({top:0,behavior:'smooth'});
     }
 
     async function deleteItem(id){
-      if(confirm('Delete this item?')){
-        await deleteDoc(doc(db,MENU_COLLECTION,id));
-      }
+      if(confirm('Delete this item?')) await deleteDoc(doc(db,MENU_COLLECTION,id));
     }
 
-    // ---------------- Auth State ----------------
+    // ---------------- AUTH STATE ----------------
     onAuthStateChanged(auth, user=>{
       if(user) renderDashboard(user);
       else renderLoginUI();
