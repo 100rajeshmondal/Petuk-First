@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetukFirst Feedback</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #ffbb70, #ff8650, #ffe0b2);
+      font-family: 'Poppins', sans-serif;
+      color: #3b1d02;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .feedback-container {
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 25px rgba(255, 130, 40, 0.5),
+                  inset 0 0 15px rgba(255, 180, 100, 0.4);
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      backdrop-filter: blur(8px);
+      transform: perspective(700px) rotateX(8deg);
+      transition: 0.3s;
+    }
+
+    .feedback-container:hover {
+      transform: perspective(700px) rotateX(0deg) scale(1.03);
+      box-shadow: 0 0 35px rgba(255, 120, 50, 0.8);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff5500;
+      margin-bottom: 20px;
+      text-shadow: 0 0 8px rgba(255, 100, 30, 0.5);
+    }
+
+    input, textarea {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 12px;
+      border: 1px solid #ffb580;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      color: #3b1d02;
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: inset 0 0 10px rgba(255, 190, 120, 0.4);
+      transition: 0.3s;
+    }
+
+    input:focus, textarea:focus {
+      box-shadow: 0 0 15px rgba(255, 140, 80, 0.7);
+      background: #fff7f0;
+      border-color: #ff7b36;
+    }
+
+    textarea {
+      resize: none;
+      height: 90px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #ff7b36, #ff5500);
+      color: #fff;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255, 110, 40, 0.6);
+      transition: all 0.3s ease-in-out;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #ff5500, #ff7b36);
+      box-shadow: 0 0 30px rgba(255, 120, 40, 0.9);
+      transform: scale(1.05);
+    }
+
+    .success {
+      display: none;
+      text-align: center;
+      color: #0a7200;
+      margin-top: 15px;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(0, 255, 100, 0.6);
+    }
+
+    .fadeIn {
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.8);}
+      to {opacity: 1; transform: scale(1);}
+    }
+  </style>
+</head>
+<body>
+  <form class="feedback-container" id="feedbackForm">
+    <h2>🍴 PetukFirst Feedback</h2>
+    <input type="text" name="name" id="name" placeholder="Your Name" required>
+    <input type="tel" name="mobile" id="mobile" placeholder="Mobile Number" pattern="[0-9]{10}" inputmode="numeric" required>
+    <textarea name="feedback" id="feedback" placeholder="Write your feedback..." required></textarea>
+    <button type="submit">Submit</button>
+    <div class="success" id="successMsg">✅ Thank you! Your feedback has been sent.</div>
+  </form>
+
+  <audio id="successSound">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const form = document.getElementById("feedbackForm");
+    const successMsg = document.getElementById("successMsg");
+    const sound = document.getElementById("successSound");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+      const feedback = document.getElementById("feedback").value.trim();
+
+      if (!name || !mobile || !feedback) {
+        alert("Please fill all fields!");
+        return;
+      }
+
+      // Send using FormSubmit
+      fetch("https://formsubmit.co/ajax/100rajeshmondal@gmail.com", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name,
+          mobile: mobile,
+          feedback: feedback,
+          _subject: "New Feedback from PetukFirst",
+          _captcha: false
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          sound.play();
+          successMsg.style.display = "block";
+          successMsg.classList.add("fadeIn");
+          form.reset();
+        } else {
+          alert("Failed to send feedback. Please try again.");
+        }
+      })
+      .catch(() => alert("Error sending feedback. Please check your connection."));
+    });
+  </script>
+</body>
+</html>

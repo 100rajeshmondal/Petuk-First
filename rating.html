@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rating Animation</title>
+<style>
+  body {
+    background-color: #0d0d0d;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+
+  h2 {
+    margin-bottom: 30px;
+    font-size: 2em;
+    letter-spacing: 1px;
+  }
+
+  .rating {
+    display: flex;
+    gap: 10px;
+    cursor: pointer;
+  }
+
+  .rating__star {
+    display: block;
+    width: 50px;
+    height: 50px;
+    fill: none;
+    stroke: #ffaa00;
+    stroke-width: 2;
+    overflow: visible;
+    pointer-events: auto;
+    transition: transform 0.3s ease;
+  }
+
+  .rating__star:hover {
+    transform: scale(1.2);
+  }
+
+  .rating__star-fill {
+    fill: #ffaa00;
+    opacity: 0;
+    transform-origin: center;
+  }
+
+  .rating__star-ring {
+    stroke: #ffaa00;
+    stroke-width: 3;
+    opacity: 0;
+  }
+
+  .rating__text {
+    margin-top: 20px;
+    font-size: 1.5em;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .active .rating__star-fill {
+    animation: fillStar 0.6s forwards ease-in-out;
+  }
+
+  .active .rating__star-ring {
+    animation: ringPop 0.6s forwards ease-in-out;
+  }
+
+  .show-text {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+  }
+
+  @keyframes fillStar {
+    0% { opacity: 0; transform: scale(0.3); }
+    50% { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes ringPop {
+    0% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: 1; transform: scale(1.3); }
+    100% { opacity: 0; transform: scale(2); }
+  }
+</style>
+</head>
+<body>
+
+<h2>Rating Animation</h2>
+
+<div class="rating" id="rating">
+  <svg class="rating__star" viewBox="0 0 24 24">
+    <polygon class="rating__star-line" points="12,2 15,10 24,10 17,15 20,23 12,18 4,23 7,15 0,10 9,10"/>
+    <polygon class="rating__star-fill" points="12,2 15,10 24,10 17,15 20,23 12,18 4,23 7,15 0,10 9,10"/>
+    <circle class="rating__star-ring" cx="12" cy="12" r="11" fill="none"/>
+  </svg>
+  <svg class="rating__star" viewBox="0 0 24 24">
+    <polygon class="rating__star-line" points="12,2 15,10 24,10 17,15 20,23 12,18 4,23 7,15 0,10 9,10"/>
+    <polygon class="rating__star-fill" points="12,2 15,10 24,10 17,15 20,23 12,18 4,23 7,15 0,10 9,10"/>
+    <circle class="rating__star-ring" cx="12" cy="12" r="11" fill="none"/>
+  </svg>
+  <svg class="rating__star" viewBox="0 0 24 24">
+    <polygon class="rating__star-line" points="12,2 15,10 24,10 17,15 20,23 12,18 4,23 7,15 0,10 9,10"/>
+    <polygon class="rating__star-fill" points="12,2 15,10 24,10 17,15 20,23 12,18 4,23 7,15 0,10 9,10"/>
+    <circle class="rating__star-ring" cx="12" cy="12" r="11" fill="none"/>
+  </svg>
+  <svg class="rating__star" viewBox="0 0 24 24">
+    <polygon class="rating__star-line" points="12,2 15,10 24,10 17,15 20,23 12,18 4,23 7,15 0,10 9,10"/>
+    <polygon class="rating__star-fill" points="12,2 15,10 24,10 17,15 20,23 12,18 4,23 7,15 0,10 9,10"/>
+    <circle class="rating__star-ring" cx="12" cy="12" r="11" fill="none"/>
+  </svg>
+  <svg class="rating__star" viewBox="0 0 24 24">
+    <polygon class="rating__star-line" points="12,2 15,10 24,10 17,15 20,23 12,18 4,23 7,15 0,10 9,10"/>
+    <polygon class="rating__star-fill" points="12,2 15,10 24,10 17,15 20,23 12,18 4,23 7,15 0,10 9,10"/>
+    <circle class="rating__star-ring" cx="12" cy="12" r="11" fill="none"/>
+  </svg>
+</div>
+
+<div class="rating__text" id="ratingText">OK</div>
+
+<script>
+  const stars = document.querySelectorAll('.rating__star');
+  const text = document.getElementById('ratingText');
+
+  stars.forEach((star, index) => {
+    star.addEventListener('click', () => {
+      stars.forEach((s, i) => {
+        const fill = s.querySelector('.rating__star-fill');
+        const ring = s.querySelector('.rating__star-ring');
+        if (i <= index) {
+          s.classList.add('active');
+          fill.style.opacity = 1;
+        } else {
+          s.classList.remove('active');
+          fill.style.opacity = 0;
+        }
+        ring.style.opacity = 0;
+      });
+
+      // Animate selected star ring
+      const selectedRing = stars[index].querySelector('.rating__star-ring');
+      selectedRing.style.opacity = 1;
+
+      // Show text animation
+      text.textContent = ["Very Bad", "Bad", "OK", "Good", "Excellent"][index];
+      text.classList.add('show-text');
+      setTimeout(() => text.classList.remove('show-text'), 1500);
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login | Petuk First</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #fff8e1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background: white;
+      width: 90%;
+      max-width: 400px;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    .login-container img {
+      width: 80px;
+      margin-bottom: 15px;
+    }
+
+    .login-container h2 {
+      margin: 0;
+      font-size: 24px;
+      color: #333;
+    }
+
+    .login-container p {
+      margin: 5px 0 15px;
+      color: #f57c00;
+      font-size: 14px;
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .login-container button {
+      width: 100%;
+      padding: 12px;
+      background-color: #f57c00;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .login-container button:hover {
+      background-color: #ef6c00;
+    }
+
+    .login-container small {
+      display: block;
+      margin-top: 15px;
+      font-size: 12px;
+      color: #333;
+    }
+
+    .login-container small a {
+      color: #1976d2;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <img src="wrap_icon.png" alt="Petuk Wrap Icon" />
+    <h2>Sign In</h2>
+    <p>or create an account</p>
+    <input type="text" id="mobileInput" placeholder="Mobile Number" />
+    <button onclick="submitLogin()">LOGIN</button>
+    <small>
+      By clicking on Login, I accept the
+      <a href="#">Terms & Conditions</a> &
+      <a href="#">Privacy Policy</a>
+    </small>
+  </div>
+
+  <script>
+    function submitLogin() {
+      const mobile = document.getElementById("mobileInput").value;
+      if (mobile.length === 10 && /^\d+$/.test(mobile)) {
+        alert("OTP sent to " + mobile);
+        // Redirect or show OTP form here
+      } else {
+        alert("Please enter a valid 10-digit mobile number.");
+      }
+    }
+  </script>
+
+</body>
+</html>

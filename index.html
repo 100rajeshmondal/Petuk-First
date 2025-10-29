@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Petuk First — Order Fresh Meals & Drinks</title>
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+  />
+
+  <style>
+  .social-icons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+  }
+  .social-icons a {
+    color: #3b1d02;
+    font-size: 24px;
+    transition: color 0.3s ease;
+  }
+  .social-icons a:hover {
+    color: #ff7b00;
+  }
+  </style>
+  </head>
+
+  <!-- Firebase compat libs (Auth, Firestore, Storage) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+  <style>
+    /* ===========================
+       PETUK FIRST — THEME
+       =========================== */
+    :root{
+      --bg1: #ffbb70; --bg2: #ff8650; --bg3: #ffe0b2;
+      --text: #3b1d02; --muted: rgba(59,29,2,0.6);
+      --accent-dark: #6b2a00; --shadow: 0 12px 40px rgba(107,42,0,0.08);
+      --danger: #B71C1C;
+    }
+    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    html,body { height:100%; margin:0; background: linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3)); color:var(--text); -webkit-font-smoothing:antialiased; }
+    .main-wrapper { max-width:1300px; margin:20px auto; padding:18px; }
+
+    .header { display:flex; align-items:center; justify-content:space-between; gap:16px; background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.78)); border-radius:16px; padding:14px 18px; box-shadow:var(--shadow); border:1px solid rgba(255,255,255,0.7); }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand-img { width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg,var(--bg1),var(--bg2)); color:var(--text); font-weight:700; font-size:18px; }
+    .title { font-weight:700; font-size:1.2rem; } .tagline { font-size:0.85rem; color:var(--muted); }
+
+    .header-nav { display:flex; gap:10px; align-items:center; }
+    .nav-pill { padding:8px 12px; border-radius:999px; background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.6)); border:1px solid rgba(255,200,150,0.12); font-weight:700; color:var(--accent-dark); text-decoration:none; cursor:pointer; }
+    .nav-pill:hover { transform: translateY(-4px); }
+
+    .app { margin-top:16px; display:grid; grid-template-columns: 260px 1fr 360px; gap:20px; align-items:start; }
+
+    .sidebar { background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.78)); border-radius:14px; padding:14px; border:1px solid rgba(255,200,150,0.12); box-shadow:var(--shadow); position: sticky; top:28px; }
+    .nav { display:flex; flex-direction:column; gap:10px; }
+    .nav-item { display:flex; align-items:center; gap:12px; padding:10px; border-radius:12px; cursor:pointer; color:var(--text); font-weight:700; background:transparent; }
+    .catering { margin-top:14px; padding:12px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.85)); border:1px solid rgba(255,200,150,0.12); }
+
+    .center { min-height:420px; display:flex; flex-direction:column; gap:18px; }
+    .catering-main { border-radius:12px; padding:14px; display:flex; align-items:center; justify-content:space-between; gap:12px; background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9)); border:1px solid rgba(255,200,150,0.12); box-shadow:0 10px 30px rgba(0,0,0,0.04); }
+
+    .cards { display:grid; gap:18px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.92)); border-radius:12px; overflow:hidden; border:1px solid rgba(255,200,150,0.08); box-shadow: 0 12px 28px rgba(0,0,0,0.04); display:flex; flex-direction:column; }
+    .card img { width:100%; height:160px; object-fit:cover; display:block; }
+    .card-body { padding:12px 14px; display:flex; flex-direction:column; gap:8px; color:var(--text); }
+    .card-title { font-weight:800; font-size:1.05rem; } .card-desc { color:var(--muted); font-size:0.9rem; } .card-price { font-weight:900; color:var(--accent-dark); }
+
+    .btn { padding:10px 12px; border-radius:10px; border:none; cursor:pointer; font-weight:800; }
+    .btn-primary { background: linear-gradient(90deg,#8a3b00,#6b2a00); color:white; }
+    .btn-lite { background:transparent; border:1px solid rgba(0,0,0,0.06); color:var(--accent-dark); }
+
+    .rightbar { background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9)); border-radius:14px; padding:16px; border:1px solid rgba(255,200,150,0.12); box-shadow:var(--shadow); position: sticky; top:28px; }
+    .cart-item { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px; border-radius:8px; background: rgba(0,0,0,0.02); }
+
+    .footer { margin-top:20px; padding:10px; border-radius:10px; text-align:center; background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.85)); border:1px solid rgba(255,200,150,0.12); box-shadow: 0 10px 30px rgba(0,0,0,0.03); display:flex; align-items:center; justify-content:center; gap:16px; font-weight:600; }
+
+    .modal-overlay { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.45); z-index:999; opacity:0; pointer-events:none; transition: opacity 180ms ease; }
+    .modal-overlay.open { opacity:1; pointer-events:auto; }
+    .modal { width:100%; max-width:420px; background:white; border-radius:12px; padding:18px; box-shadow:0 18px 48px rgba(0,0,0,0.3); }
+    .input { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(0,0,0,0.06); }
+
+    .small { font-size:0.9rem; color:var(--muted); }
+    .error { color:var(--danger); margin-top:8px; }
+    @media (max-width:1100px) { .app { grid-template-columns: 1fr; } .sidebar, .rightbar { position: static; top:auto; } }
+  </style>
+</head>
+<body>
+
+  <div class="main-wrapper">
+    <!-- HEADER -->
+    <header class="header" role="banner">
+      <div class="brand">
+        <img src="petuk_logo.png" alt="Petuk First Logo" style="height: 60px; margin-right: 15px;">
+        <div>
+          <div class="title">Petuk First</div>
+          <div class="tagline">First in Taste, Fast in Delivery</div>
+        </div>
+      </div>
+
+      <!-- Header nav -->
+      <nav class="header-nav" aria-label="top navigation">
+        <a class="nav-pill" id="getAppLink" href="#" target="_blank" rel="noopener">Get the App</a>
+        <a class="nav-pill" href="about.html" target="_blank" rel="noopener">About Us</a>
+        <a class="nav-pill" href="feedback.html" target="_blank" rel="noopener">Feedback</a>
+        <button class="nav-pill" id="authButton">Login</button>
+      </nav>
+    </header>
+
+    <!-- APP GRID -->
+    <div class="app" role="main">
+      <!-- LEFT SIDEBAR -->
+      <aside class="sidebar" aria-label="Primary navigation">
+        <nav class="nav" role="navigation" aria-label="Menu categories">
+          <div class="nav-item" data-tab="featured" onclick="switchCategory('featured')" id="tab-featured"><div class="icon">⭐</div><div>Featured</div></div>
+          <div class="nav-item" data-tab="chicken" onclick="switchCategory('chicken')" id="tab-chicken"><div class="icon">🍗</div><div>Chicken</div></div>
+          <div class="nav-item" data-tab="mutton" onclick="switchCategory('mutton')" id="tab-mutton"><div class="icon">🥘</div><div>Mutton</div></div>
+          <div class="nav-item" data-tab="fastfood" onclick="switchCategory('fastfood')" id="tab-fastfood"><div class="icon">🌯</div><div>Rolls & Snacks</div></div>
+          <div class="nav-item" data-tab="staples" onclick="switchCategory('staples')" id="tab-staples"><div class="icon">🍚</div><div>Breads & Rice</div></div>
+          <div class="nav-item" data-tab="drinks" onclick="switchCategory('drinks')" id="tab-drinks"><div class="icon">🥤</div><div>Drinks</div></div>
+        </nav>
+
+        <div class="catering" aria-labelledby="cateringTitle">
+          <div id="cateringTitle" style="font-weight:800;color:var(--accent-dark)">For Bulk Order</div>
+          <div class="small" style="margin-bottom:8px">We provide full event catering — quality & taste guaranteed.</div>
+          <a href="maacaterer.html" class="small" style="text-decoration:none;background:linear-gradient(90deg,var(--bg1),var(--bg2));padding:6px 10px;border-radius:999px;color:white;font-weight:800">MAA Caterer →</a>
+        </div>
+      </aside>
+
+      <!-- CENTER CONTENT -->
+      <main class="center" id="mainContent" aria-live="polite">
+        <div class="catering-main" role="region" aria-label="Opening notice">
+          <div><div style="font-weight:800;color:var(--accent-dark)">PetukFirst is launching on 1st November 2025!</div><div class="small">Your new destination for delicious online food ordering and a seamless customer dashboard experience.</div></div>
+          <div><img src="slogo.png" alt="Petuk First Logo" style="height:60px"></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h2 id="sectionTitle" style="margin:0">Featured Dishes</h2>
+          <div class="small">Live menu • <span id="menuStatus">Connecting...</span></div>
+        </div>
+
+        <!-- Cards -->
+        <div id="cardsContainer">
+          <div id="skeletons" class="skel-grid" aria-hidden="true">
+            <div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>
+          </div>
+          <div id="cardsGrid" class="cards" style="display:none"></div>
+        </div>
+
+        <div style="text-align:center;padding:12px 0;"><button class="btn-lite btn" onclick="manualRefresh()">🔄 Check for Live Menu Update</button></div>
+      </main>
+
+      <!-- RIGHTBAR (CART) -->
+      <aside class="rightbar" aria-label="Your order cart">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-weight:800">Your Order Cart</div>
+          <div id="cartCountPill" class="small" style="background:linear-gradient(90deg,var(--bg1),var(--bg2));color:white;padding:6px 10px;border-radius:999px">0 items</div>
+        </div>
+
+        <div id="cartList" style="display:flex;flex-direction:column;gap:8px;min-height:120px">
+          <div id="emptyCartMessage" class="small" style="text-align:center;opacity:0.85">Your cart is empty. Add delicious food from the menu!</div>
+        </div>
+
+        <div id="checkoutSummary" style="display:none;margin-top:12px">
+          <div style="display:flex;justify-content:space-between"><span>Subtotal</span><span id="subtotalValue">₹0</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Delivery Fee</span><span id="deliveryFeeValue">₹30</span></div>
+          <div style="display:flex;justify-content:space-between;font-weight:800;margin-top:8px"><span>TOTAL PAYABLE</span><span id="totalValue">₹30</span></div>
+          <button class="btn-primary btn" id="checkoutBtn" style="width:100%;margin-top:12px" onclick="handleOrderButtonClick()">Proceed to WhatsApp Order</button>
+          <div class="small" style="text-align:center;margin-top:8px" id="deliveryWaiverNote">Delivery Fee: ₹30. Free delivery for orders over ₹249.</div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer" role="contentinfo">
+      <div>© 2025 Petuk First — All Rights Reserved.</div>
+      <div class="social-icons">
+        <a href="https://facebook.com/petukfirst" target="_blank" aria-label="Facebook">
+         <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="https://instagram.com/petukfirst" target="_blank" aria-label="Instagram">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="https://wa.me/yourwhatsapplink" target="_blank" aria-label="WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+          <a href="https://youtube.com/@petukfirst" target="_blank" aria-label="YouTube">
+            <i class="fab fa-youtube"></i>
+          </a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- LOGIN MODAL (Email + Password + Magic Link) -->
+  <div id="loginModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-labelledby="loginTitle" aria-modal="true">
+      <h3 id="loginTitle" style="margin-top:0;color:var(--accent-dark)">Petuk First — Login to Continue</h3>
+
+      <div class="small" style="margin-bottom:10px">
+        Sign in with your email. By signing in you agree to our
+        <a href="terms.html" target="_blank" rel="noopener">Terms &amp; Conditions</a>.
+      </div>
+
+      <form id="emailLoginForm">
+        <label class="small">Email</label>
+        <input id="emailInput" class="input" type="email" placeholder="you@example.com" required>
+
+        <label class="small" style="margin-top:10px">Password</label>
+        <input id="passwordInput" class="input" type="password" placeholder="Enter password (min 6 chars)">
+
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button id="signInBtn" class="btn-primary btn" style="flex:1">Sign In</button>
+          <button id="registerBtn" class="btn-lite btn" style="flex:1">Register</button>
+        </div>
+
+        <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+          <button id="magicLinkBtn" class="btn-lite btn" style="flex:1">Send Magic Link</button>
+        </div>
+
+        <div id="authError" class="error" role="alert" style="min-height:1.2em"></div>
+
+        <div style="text-align:right;margin-top:10px">
+          <a href="#" onclick="closeLoginModal();return false" style="color:var(--accent-dark)">Close</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- USER DATA MODAL -->
+  <div id="userDataModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-labelledby="userDataTitle" aria-modal="true">
+      <h3 id="userDataTitle" style="margin-top:0;color:var(--accent-dark)">Welcome! Complete your details</h3>
+      <form id="userDataForm">
+        <label class="small">Full name</label>
+        <input id="userNameInput" class="input" type="text" required>
+        <label class="small" style="margin-top:8px">Delivery address</label>
+        <input id="userAddressInput" class="input" type="text" required>
+        <div id="userDataError" class="error"></div>
+        <div style="margin-top:10px"><button type="submit" class="btn-primary btn" style="width:100%">Save Details & Continue</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT: Firebase + App Logic (Email auth only) -->
+  <script>
+    /************************************************************************
+     * Firebase Email+Password + Magic Link authentication
+     ************************************************************************/
+
+    // ------------- Firebase config -------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyDTI5qygfRfvIS9lKPzHGqg3rg-PFgGfPE",
+      authDomain: "petuk-first.firebaseapp.com",
+      projectId: "petuk-first",
+      storageBucket: "petuk-first.appspot.com",
+      messagingSenderId: "272897553563",
+      appId: "1:272897553563:web:3b0966e5e33d083e20023e"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // ------------- UI refs & state -------------
+    const ui = {
+      cardsGrid: document.getElementById('cardsGrid'),
+      skeletons: document.getElementById('skeletons'),
+      cardsContainer: document.getElementById('cardsContainer'),
+      menuStatus: document.getElementById('menuStatus'),
+      sectionTitleEl: document.getElementById('sectionTitle'),
+      authButton: document.getElementById('authButton'),
+      loginModal: document.getElementById('loginModal'),
+      emailInput: document.getElementById('emailInput'),
+      passwordInput: document.getElementById('passwordInput'),
+      signInBtn: document.getElementById('signInBtn'),
+      registerBtn: document.getElementById('registerBtn'),
+      magicLinkBtn: document.getElementById('magicLinkBtn'),
+      authError: document.getElementById('authError'),
+      userDataModal: document.getElementById('userDataModal'),
+      userNameInput: document.getElementById('userNameInput'),
+      userAddressInput: document.getElementById('userAddressInput'),
+      cartList: document.getElementById('cartList'),
+      emptyCartMessage: document.getElementById('emptyCartMessage'),
+      checkoutSummary: document.getElementById('checkoutSummary'),
+      cartCountPill: document.getElementById('cartCountPill'),
+      subtotalValue: document.getElementById('subtotalValue'),
+      deliveryFeeValue: document.getElementById('deliveryFeeValue'),
+      totalValue: document.getElementById('totalValue'),
+      deliveryWaiverNote: document.getElementById('deliveryWaiverNote'),
+      menuStatusSpan: document.getElementById('menuStatus')
+    };
+
+    // constants & app state
+    const WA_NUMBER = "919474104010";
+    const FIXED_DELIVERY_FEE = 30;
+    const FREE_DELIVERY_THRESHOLD = 249;
+    const LOCAL_STORAGE_KEY = 'pf_user_details';
+    let CART = JSON.parse(localStorage.getItem('pf_cart') || '[]');
+    let USER_DETAILS = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || 'null');
+    let CURRENT_CATEGORY = 'featured';
+    let currentMenuDocs = [];
+    let authUser = null; // firebase user object
+
+    // ------------- Auth state handling -------------
+    auth.onAuthStateChanged(user => {
+      authUser = user;
+      updateAuthUI();
+      if (user) {
+        // ensure user details modal opens if name/address not present
+        if (!USER_DETAILS || !USER_DETAILS.name || !USER_DETAILS.address) {
+          closeLoginModal();
+          openUserDataModal();
+        } else {
+          closeLoginModal();
+        }
+      } else {
+        // signed out
+      }
+    });
+
+    // ------------- Magic link handling on page load -------------
+    document.addEventListener('DOMContentLoaded', () => {
+      // If this is a sign-in with email link, complete the sign-in
+      if (auth.isSignInWithEmailLink(window.location.href)) {
+        // Try to get the email from localStorage where we saved it when sending the link
+        let emailForSignIn = localStorage.getItem('pf_email_for_signin');
+        if (!emailForSignIn) {
+          // If not found, ask the user to enter the email they used
+          emailForSignIn = window.prompt('Please provide the email used to sign in (for completing magic link):');
+        }
+        if (emailForSignIn) {
+          auth.signInWithEmailLink(emailForSignIn, window.location.href)
+            .then(result => {
+              // clear stored email
+              localStorage.removeItem('pf_email_for_signin');
+              // signed in — the onAuthStateChanged will handle UI
+              console.info('Signed in with magic link:', result.user && result.user.email);
+              // remove the link from URL (nice to clean up)
+              if (history && history.replaceState) history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+            })
+            .catch(err => {
+              console.error('Error finishing magic link sign-in:', err);
+              ui.authError.textContent = 'Failed to complete magic-link sign-in. Try signing in manually.';
+            });
+        }
+      }
+    });
+
+    // ------------- Auth UI helpers -------------
+    function updateAuthUI() {
+      if (authUser) {
+        // show welcome + logout
+        const displayName = USER_DETAILS && USER_DETAILS.name ? USER_DETAILS.name.split(' ')[0] : (authUser.email ? authUser.email.split('@')[0] : 'Welcome');
+        ui.authButton.textContent = `Hi, ${displayName}`;
+      } else {
+        ui.authButton.textContent = 'Login';
+      }
+    }
+
+    function openLoginModal() {
+      ui.loginModal.classList.add('open');
+      ui.loginModal.style.opacity = 1; ui.loginModal.style.pointerEvents = 'auto';
+      ui.authError.textContent = '';
+      ui.emailInput.value = '';
+      ui.passwordInput.value = '';
+    }
+    function closeLoginModal() {
+      ui.loginModal.classList.remove('open');
+      ui.loginModal.style.opacity = 0; ui.loginModal.style.pointerEvents = 'none';
+      ui.authError.textContent = '';
+    }
+
+    function openUserDataModal() {
+      ui.userDataModal.classList.add('open');
+      ui.userDataModal.style.opacity = 1; ui.userDataModal.style.pointerEvents = 'auto';
+      ui.userNameInput.value = USER_DETAILS?.name || '';
+      ui.userAddressInput.value = USER_DETAILS?.address || '';
+    }
+    function closeUserDataModal() {
+      ui.userDataModal.classList.remove('open');
+      ui.userDataModal.style.opacity = 0; ui.userDataModal.style.pointerEvents = 'none';
+    }
+
+    // ------------- Email / Password / Register / Magic Link flows -------------
+
+    // Sign in with email + password
+    async function signInWithEmail() {
+      ui.authError.textContent = '';
+      const email = (ui.emailInput.value || '').trim();
+      const password = (ui.passwordInput.value || '').trim();
+      if (!email) { ui.authError.textContent = 'Enter email.'; return; }
+      if (!password) { ui.authError.textContent = 'Enter password.'; return; }
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        closeLoginModal();
+      } catch (err) {
+        console.error('Sign-in error', err);
+        ui.authError.textContent = err.message || 'Sign-in failed.';
+      }
+    }
+
+    // Register with email + password
+    async function registerWithEmail() {
+      ui.authError.textContent = '';
+      const email = (ui.emailInput.value || '').trim();
+      const password = (ui.passwordInput.value || '').trim();
+      if (!email) { ui.authError.textContent = 'Enter email.'; return; }
+      if (!password || password.length < 6) { ui.authError.textContent = 'Enter a password (min 6 chars).'; return; }
+      try {
+        const res = await auth.createUserWithEmailAndPassword(email, password);
+        // user created and automatically signed in
+        closeLoginModal();
+        if (!USER_DETAILS || !USER_DETAILS.name) openUserDataModal();
+      } catch (err) {
+        console.error('Register error', err);
+        ui.authError.textContent = err.message || 'Registration failed.';
+      }
+    }
+
+    // Send Magic Link (passwordless)
+    async function sendMagicLink() {
+      ui.authError.textContent = '';
+      const email = (ui.emailInput.value || '').trim();
+      if (!email) { ui.authError.textContent = 'Enter email to send magic link.'; return; }
+
+      // actionCodeSettings - change url if needed; must match authorized domain in Firebase console
+      const actionCodeSettings = {
+        // URL you want to redirect back to. Using current origin so this page can handle it.
+        url: window.location.origin + window.location.pathname,
+        // This must be true for signInWithEmailLink
+        handleCodeInApp: true
+      };
+
+      try {
+        await auth.sendSignInLinkToEmail(email, actionCodeSettings);
+        // Save email locally to complete sign-in when user returns
+        localStorage.setItem('pf_email_for_signin', email);
+        ui.authError.style.color = 'green';
+        ui.authError.textContent = 'Magic link sent to your email. Follow the link to sign in.';
+        // keep modal open — user will click link in their email and be redirected back
+      } catch (err) {
+        console.error('sendSignInLinkToEmail error', err);
+        ui.authError.style.color = '';
+        ui.authError.textContent = err.message || 'Failed to send magic link.';
+      }
+    }
+
+    // Logout
+    async function signOutUser() {
+      try {
+        await auth.signOut();
+        USER_DETAILS = null;
+        localStorage.removeItem(LOCAL_STORAGE_KEY);
+        updateAuthUI();
+        alert('Logged out');
+      } catch (err) {
+        console.error('Sign out error', err);
+      }
+    }
+
+    // ------------- Firestore realtime menu listener -------------
+    function attachMenuListener() {
+      ui.menuStatus.textContent = 'Connecting...';
+      try {
+        db.collection('menus').orderBy('name').onSnapshot(snapshot => {
+          currentMenuDocs = [];
+          snapshot.forEach(doc => {
+            const data = doc.data(); data._id = doc.id;
+            currentMenuDocs.push(data);
+          });
+          ui.menuStatus.textContent = 'Live';
+          renderMenuFromDocs(currentMenuDocs);
+        }, err => {
+          console.error('Menu listener error:', err);
+          ui.menuStatus.textContent = 'Offline';
+          showMenuFallback();
+        });
+      } catch (err) {
+        console.error('Failed to attach Firestore listener:', err);
+        ui.menuStatus.textContent = 'Offline';
+        showMenuFallback();
+      }
+    }
+    function showMenuFallback() {
+      ui.cardsGrid.style.display = 'none';
+      ui.skeletons.style.display = 'none';
+      const fallback = document.createElement('div');
+      fallback.style.padding = '18px';
+      fallback.style.borderRadius = '12px';
+      fallback.style.background = 'rgba(255,255,255,0.9)';
+      fallback.style.color = 'var(--accent-dark)';
+      fallback.style.textAlign = 'center';
+      fallback.textContent = 'Unable to load live menu. Please try again later.';
+      ui.cardsContainer.insertAdjacentElement('afterbegin', fallback);
+    }
+
+    function renderMenuFromDocs(docs) {
+      ui.skeletons.style.display = 'none';
+      ui.cardsGrid.style.display = 'grid';
+      ui.cardsGrid.innerHTML = '';
+
+      const titleMap = { featured:'Featured Dishes', chicken:'Chicken Specialties', mutton:'Mutton Specials', fastfood:'Rolls & Snacks', staples:'Breads & Rice', drinks:'Beverages' };
+      ui.sectionTitleEl.textContent = titleMap[CURRENT_CATEGORY] || 'Menu';
+
+      const filtered = docs.filter(d => {
+        if (d.available === false) return false;
+        if (d.category) return d.category.includes(CURRENT_CATEGORY);
+        return CURRENT_CATEGORY === 'featured';
+      });
+
+      if (!filtered.length) {
+        ui.cardsGrid.innerHTML = '<div style="grid-column:1/-1;padding:24px;text-align:center;color:var(--muted)">No items found in this category.</div>';
+        return;
+      }
+
+      filtered.forEach(item => {
+        const prices = [];
+        if (item.priceSmall) prices.push(`S: ₹${item.priceSmall}`);
+        if (item.priceMedium) prices.push(`M: ₹${item.priceMedium}`);
+        if (item.priceLarge) prices.push(`L: ₹${item.priceLarge}`);
+        const priceHtml = prices.length ? prices.join(' | ') : (item.price ? `₹${item.price}` : 'Price on request');
+
+        let imgHtml = '';
+        if (item.image) {
+          const src = item.image;
+          imgHtml = `<img src="${escapeHtml(src)}" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">`;
+        } else {
+          imgHtml = `<div style="height:160px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--text);font-weight:800">${escapeHtml((item.name||'Food').split(' ')[0])}</div>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          ${imgHtml}
+          <div class="card-body">
+            <div class="card-title">${escapeHtml(item.name || '')}</div>
+            <div class="card-desc">${escapeHtml(item.description || '')}</div>
+            <div class="card-price">${priceHtml}</div>
+            <div class="card-actions">
+              <button class="btn-primary btn" onclick='addToCartFromMenu("${escapeJS(item._id)}")'>Add to Cart</button>
+              <a class="btn-lite btn" href="https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('I want to order ' + (item.name || ''))}" target="_blank" rel="noopener">Order on WhatsApp</a>
+            </div>
+          </div>
+        `;
+        ui.cardsGrid.appendChild(card);
+      });
+    }
+
+    function escapeHtml(s='') { return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
+    function escapeJS(s='') { return String(s).replace(/(["'\\])/g, '\\$1'); }
+
+    function manualRefresh() { renderMenuFromDocs(currentMenuDocs); alert('Menu refreshed (live data).'); }
+
+    // ------------- CART -------------
+    function addToCartFromMenu(docId) {
+      const item = currentMenuDocs.find(d => d._id === docId);
+      if (!item) return;
+      const price = item.priceMedium || item.priceSmall || item.priceLarge || item.price || 0;
+      const existing = CART.find(c => c.id === docId);
+      if (existing) existing.quantity++;
+      else CART.push({ id: docId, name: item.name, price: price, quantity: 1 });
+      saveCart(); renderCart();
+    }
+    function updateCartQuantity(dishId, removeAll=false) {
+      const idx = CART.findIndex(i => i.id === dishId);
+      if (idx === -1) return;
+      if (removeAll || CART[idx].quantity === 1) CART.splice(idx,1);
+      else CART[idx].quantity--;
+      saveCart(); renderCart();
+    }
+    function saveCart() { localStorage.setItem('pf_cart', JSON.stringify(CART)); }
+    function renderCart() {
+      ui.cartList.innerHTML = '';
+      if (!CART.length) {
+        ui.emptyCartMessage.style.display = 'block';
+        ui.checkoutSummary.style.display = 'none';
+        ui.cartCountPill.textContent = '0 items';
+        return;
+      }
+      ui.emptyCartMessage.style.display = 'none';
+      let subtotal = 0; let totalQty = 0;
+      CART.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal; totalQty += item.quantity;
+        const el = document.createElement('div');
+        el.className = 'cart-item';
+        el.innerHTML = `
+          <div>${item.quantity}x ${escapeHtml(item.name)}</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="font-weight:800">₹${itemTotal}</div>
+            <button style="background:none;border:none;color:var(--danger);cursor:pointer" onclick='updateCartQuantity("${escapeJS(item.id)}")'>-</button>
+            <button style="background:none;border:none;color:var(--accent-dark);cursor:pointer" onclick='updateCartQuantity("${escapeJS(item.id)}", true)'>×</button>
+          </div>
+        `;
+        ui.cartList.appendChild(el);
+      });
+      const deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : FIXED_DELIVERY_FEE;
+      const total = subtotal + deliveryFee;
+      ui.subtotalValue.textContent = `₹${subtotal}`;
+      ui.deliveryFeeValue.textContent = `₹${deliveryFee}`;
+      ui.totalValue.textContent = `₹${total}`;
+      ui.cartCountPill.textContent = `${totalQty} item${totalQty===1?'':'s'}`;
+      ui.checkoutSummary.style.display = 'block';
+      ui.deliveryWaiverNote.textContent = deliveryFee === 0 ? `FREE Delivery! (Order over ₹${FREE_DELIVERY_THRESHOLD})` : `Delivery Fee: ₹${FIXED_DELIVERY_FEE}. Free delivery for orders over ₹${FREE_DELIVERY_THRESHOLD}.`;
+    }
+
+    // ------------- USER DATA save -------------
+    document.getElementById('userDataForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = ui.userNameInput.value.trim();
+      const address = ui.userAddressInput.value.trim();
+      if (!name || !address) { document.getElementById('userDataError').textContent = 'Both name and address are required.'; return; }
+      USER_DETAILS = { name, address, email: authUser ? authUser.email : '' };
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(USER_DETAILS));
+      closeUserDataModal();
+      updateAuthUI();
+      alert('Details saved! You are ready to order.');
+    });
+
+    // ------------- Checkout -> WhatsApp -------------
+    function handleOrderButtonClick() {
+      if (!CART.length) { alert('Your cart is empty!'); return; }
+      if (!authUser || !USER_DETAILS || !USER_DETAILS.name || !USER_DETAILS.address) {
+        alert('Please log in and complete your name/address details to place an order.');
+        openLoginModal();
+        return;
+      }
+      const subtotal = CART.reduce((s,i)=>s + (i.price * i.quantity), 0);
+      const deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : FIXED_DELIVERY_FEE;
+      const total = subtotal + deliveryFee;
+      let message = `*Petuk First Order (Online)*\n\n*Customer:* ${USER_DETAILS.name}\n`;
+      if (authUser && authUser.email) message += `*Email:* ${authUser.email}\n`;
+      message += `*Delivery Address:* ${USER_DETAILS.address}\n\n*Order Details:*\n`;
+      CART.forEach(i => { message += `• ${i.name} (${i.quantity} x ₹${i.price} = ₹${i.quantity*i.price})\n`; });
+      message += `\n*Subtotal:* ₹${subtotal}\n*Delivery Fee:* ₹${deliveryFee}\n*TOTAL PAYABLE:* ₹${total}`;
+      const encoded = encodeURIComponent(message);
+      window.open(`https://wa.me/${WA_NUMBER}?text=${encoded}`, '_blank');
+    }
+
+    // ------------- Init app -------------
+    function initApp() {
+      renderCart();
+      try { attachMenuListener(); } catch (err) { console.error(err); ui.menuStatusSpan.textContent = 'Offline'; }
+
+      // wire header auth button
+      ui.authButton.addEventListener('click', () => {
+        if (authUser) {
+          if (confirm('Do you want to log out?')) signOutUser();
+        } else {
+          openLoginModal();
+        }
+      });
+
+      // wire modal buttons
+      ui.signInBtn.addEventListener('click', (e) => { e.preventDefault(); signInWithEmail(); });
+      ui.registerBtn.addEventListener('click', (e) => { e.preventDefault(); registerWithEmail(); });
+      ui.magicLinkBtn.addEventListener('click', (e) => { e.preventDefault(); sendMagicLink(); });
+
+      // restore user details if any
+      USER_DETAILS = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || 'null');
+      updateAuthUI();
+    }
+
+    document.addEventListener('DOMContentLoaded', initApp);
+
+    // expose some functions to inline handlers
+    window.switchCategory = function(cat){ CURRENT_CATEGORY = cat; document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.getAttribute('data-tab')===cat)); renderMenuFromDocs(currentMenuDocs); };
+    window.manualRefresh = manualRefresh;
+    window.addToCartFromMenu = addToCartFromMenu;
+    window.updateCartQuantity = updateCartQuantity;
+    window.handleOrderButtonClick = handleOrderButtonClick;
+    window.openLoginModal = openLoginModal;
+    window.closeLoginModal = closeLoginModal;
+    window.openUserDataModal = openUserDataModal;
+    window.renderCart = renderCart;
+    window.saveCart = saveCart;
+    window.signOutUser = signOutUser;
+  </script>
+</body>
+</html>
