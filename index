@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>PetukFirst — Dashboard</title>
+
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+	<style>
+		:root {
+			--primary: #ff6347;
+			--accent: #ff944d;
+			--bg: #f9f9f9;
+			--dark: #333;
+			--radius: 10px;
+			--bg1: #ffbb70;
+			--bg2: #ff8650;
+			--bg3: #ffe0b2; /* Light Orange/Cream background */
+		}
+
+		/* Announcement (marquee-like) */
+		.announcement-bar {
+		  background: #ff5722;
+		  color: #fff;
+		  font-weight: 600;
+		  text-align: center;
+		  overflow: hidden;
+		  white-space: nowrap;
+		  padding: 10px 0;
+		  position: relative;
+		  font-family: 'Poppins', sans-serif;
+		}
+		.announcement-bar span {
+		  display: inline-block;
+		  padding-left: 100%;
+		  animation: scrollText 30s linear infinite;
+		}
+		@keyframes scrollText {
+		  from { transform: translateX(0); }
+		  to   { transform: translateX(-100%); }
+		}
+
+		body {
+			font-family: 'Poppins', sans-serif;
+			background: var(--bg3);
+			margin: 0;
+			color: var(--dark);
+			overflow-x: hidden;
+		}
+
+		/* --- Header --- */
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 10px 20px;
+			background: var(--bg2);
+			box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+			position: sticky;
+			top: 0;
+			z-index: 99;
+		}
+		.header-left {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+		.logo {
+			height: 40px;
+			width: 40px;
+			background: white;
+			border-radius: 50%;
+			color: var(--primary);
+			font-size: 18px;
+			font-weight: 700;
+			text-align: center;
+			line-height: 40px;
+			box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+		}
+		.title-tagline {
+			display: flex;
+			flex-direction: column;
+			line-height: 1.2;
+		}
+		.title-tagline h1 {
+			font-size: 20px;
+			margin: 0;
+			color: white;
+		}
+		.title-tagline span {
+			font-size: 12px;
+			color: rgba(255, 255, 255, 0.8);
+		}
+		.header-right {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+		.header-right a, .header-right button {
+			background: none;
+			border: none;
+			color: white;
+			cursor: pointer;
+			font-weight: 600;
+			text-decoration: none;
+			white-space: nowrap;
+			padding: 4px 8px;
+			font-size: 14px;
+		}
+		.header-right button {
+			background: white;
+			color: var(--primary);
+			padding: 6px 12px;
+			border-radius: var(--radius);
+			transition: opacity 0.2s;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+		}
+		.header-right button:hover { opacity: 0.9; }
+
+		/* --- Layout --- */
+		.main {
+			display: flex;
+			min-height: calc(100vh - 80px - 80px);
+			background: var(--bg3);
+		}
+
+		aside {
+			width: 170px;
+			background: white;
+			padding: 10px;
+			box-shadow: 1px 0 5px rgba(0,0,0,0.05);
+			flex-shrink: 0;
+		}
+		.nav-item {
+			padding: 12px 15px;
+			border-radius: var(--radius);
+			cursor: pointer;
+			margin-bottom: 6px;
+			transition: background 0.2s, color 0.2s;
+			font-weight: 500;
+			white-space: nowrap;
+		}
+		.nav-item.active, .nav-item:hover {
+			background: var(--accent);
+			color: white;
+		}
+		main {
+			flex: 1;
+			padding: 20px;
+			overflow-y: auto;
+			background: var(--bg3);
+		}
+		h2 {
+			margin-top: 0;
+			color: var(--primary);
+			border-bottom: 2px solid #eee;
+			padding-bottom: 10px;
+			margin-bottom: 20px;
+		}
+		.cards-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+			gap: 16px;
+		}
+		.card {
+			background: white;
+			border-radius: var(--radius);
+			box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+			transition: transform 0.2s;
+		}
+		.card:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+		}
+		.card img {
+			width: 100%;
+			height: 140px;
+			object-fit: cover;
+			display: block;
+		}
+		.card-body {
+			padding: 10px 14px;
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+		}
+		.card-title {
+			font-weight: 600;
+			font-size: 16px;
+			margin-bottom: 6px;
+		}
+		.card-desc {
+			font-size: 14px;
+			color: #555;
+			flex: 1;
+			margin-bottom: 8px;
+		}
+		.card-price {
+			margin-top: 8px;
+			font-weight: 700;
+			color: var(--primary);
+		}
+		.btn {
+			background: var(--primary);
+			color: white;
+			border: none;
+			padding: 8px 12px;
+			border-radius: var(--radius);
+			cursor: pointer;
+			font-weight: 600;
+			transition: transform 0.1s;
+			box-shadow: 0 2px 4px rgba(255, 99, 71, 0.4);
+		}
+		.btn:active {
+			transform: scale(0.98);
+		}
+
+		/* --- Footer Styling --- */
+		footer {
+			text-align: center;
+			padding: 40px 20px;
+			font-size: 14px;
+			background: var(--bg3);
+			color: var(--dark);
+			box-shadow: none;
+		}
+
+		.footer-content {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 10px 20px;
+			background: white;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+			position: sticky;
+			bottom: 0;
+			z-index: 99;
+		}
+
+		.social-icons {
+			display: flex;
+			gap: 15px;
+			font-size: 20px;
+		}
+		.social-icons a {
+			color: var(--bg2);
+			transition: transform 0.2s;
+			text-decoration: none;
+		}
+		.social-icons a:hover {
+			transform: scale(1.1);
+		}
+
+		/* --- Cart Panel --- */
+		.cart-panel {
+			position: fixed;
+			top: 55px;
+			right: -320px;
+			width: 300px;
+			background: #fff;
+			height: calc(100% - 70px);
+			box-shadow: -2px 0 6px rgba(0,0,0,0.2);
+			border-top-left-radius: 12px;
+			border-bottom-left-radius: 12px;
+			padding: 15px;
+			display: flex;
+			flex-direction: column;
+			transition: right 0.3s ease;
+			z-index: 200;
+		}
+		.cart-panel.open { right: 0; }
+		.cart-toggle {
+			top: 70px;
+			right: 20px;
+			position: fixed;
+			background: var(--primary);
+			color: #fff;
+			padding: 12px 16px;
+			border-radius: var(--radius);
+			cursor: pointer;
+			z-index: 201;
+			font-weight: 600;
+			box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+			transition: transform 0.2s;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+		.cart-toggle:active { transform: scale(0.95); }
+		.cart-items { flex: 1; overflow-y: auto; }
+		.cart-item {
+			border-bottom: 1px solid #eee;
+			padding: 8px 0;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		.cart-item span { font-size: 14px; }
+		.qty-controls {
+			display: flex;
+			align-items: center;
+			gap: 5px;
+		}
+		.qty-controls button {
+			background: var(--accent);
+			border: none;
+			color: white;
+			border-radius: 50%;
+			width: 26px; height: 26px;
+			font-weight: 700;
+			cursor: pointer;
+			transition: transform 0.1s;
+			flex-shrink: 0;
+		}
+		.qty-controls button:active { transform: scale(0.9); }
+		.cart-summary {
+			border-top: 1px solid #eee;
+			padding-top: 10px;
+			font-size: 14px;
+		}
+		.cart-summary div { display: flex; justify-content: space-between; margin-bottom: 4px; }
+		.offer-text { font-size: 13px; color: var(--primary); margin-top: 6px; text-align: center; font-weight: 500; }
+
+		/* --- Modal (login/signup) --- */
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 300;
+			left: 0; top: 0;
+			width: 100%; height: 100%;
+			background: rgba(0,0,0,0.4);
+			justify-content: center;
+			align-items: center;
+			animation: fadeIn 0.3s ease;
+		}
+		@keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+		.modal-content {
+			background: white;
+			padding: 20px;
+			border-radius: var(--radius);
+			width: 320px;
+			max-width: 90%;
+			box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+		}
+		.modal-content h3 { text-align: center; color: var(--primary); margin-top: 0; }
+		.modal-content input {
+			width: 100%;
+			padding: 10px;
+			margin: 8px 0;
+			border: 1px solid #ccc;
+			border-radius: var(--radius);
+			box-sizing: border-box;
+		}
+		.modal-footer { text-align: center; font-size: 14px; margin-top: 10px; }
+		.modal-footer a { color: var(--primary); text-decoration: none; font-weight: 500; }
+		.policy-links { font-size: 12px; margin-top: 6px; color: #777; }
+		.policy-links a { color: var(--primary); text-decoration: none; margin: 0 5px; }
+
+		/* --- Toast Notification Styles --- */
+		#toastContainer {
+			position: fixed;
+			bottom: 20px;
+			right: 20px;
+			z-index: 1000;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+		.toast {
+			background: var(--primary);
+			color: white;
+			padding: 12px 20px;
+			border-radius: var(--radius);
+			box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+			min-width: 250px;
+			max-width: 90vw;
+			opacity: 0;
+			transform: translateY(20px);
+			transition: opacity 0.3s ease, transform 0.3s ease;
+			font-size: 14px;
+		}
+		.toast.show { opacity: 1; transform: translateY(0); }
+
+		/* --- Responsive --- */
+		@media (max-width: 768px) {
+			.main { flex-direction: column; min-height: calc(100vh - 100px); }
+			.header-right a { display: none; }
+			.header-right button { padding: 8px 10px; }
+			.title-tagline h1 { font-size: 16px; }
+			.title-tagline span { font-size: 10px; }
+			.logo { height: 35px; width: 35px; line-height: 35px; font-size: 16px; }
+
+			aside { width: 100%; padding: 10px 0; box-shadow: 0 1px 5px rgba(0,0,0,0.05); overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; display: flex; background: var(--bg); }
+			aside::-webkit-scrollbar { display: none; }
+			.nav-item { display: inline-block; flex-shrink: 0; margin: 0 8px; padding: 8px 12px; font-size: 14px; }
+			.nav-item:first-child { margin-left: 15px; }
+			.nav-item:last-child { margin-right: 15px; }
+
+			main { padding: 15px; }
+			.cards-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+
+			.cart-panel { width: 100%; right: -100%; top: 0; height: 100%; border-radius: 0; padding-top: 70px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+			.cart-toggle { bottom: 10px; right: 10px; top: auto; }
+
+			footer { padding: 20px 10px; }
+			.footer-content { flex-direction: column; gap: 15px; padding: 15px; }
+			.copyright { order: 2; font-size: 12px; }
+			.social-icons { order: 1; }
+
+			.modal-content { max-width: 95%; margin: 10px; }
+		}
+	</style>
+</head>
+<body>
+
+<header>
+	<div class="header-left">
+		<div class="logo" aria-hidden="true">P1</div>
+		<div class="title-tagline">
+			<h1>PetukFirst</h1>
+			<span>First in Taste, Fast in Delivery</span>
+		</div>
+	</div>
+	<div class="header-right">
+		<a href="#" aria-label="Get the App">Get the App</a>
+		<a href="#" aria-label="About Us">About Us</a>
+		<a href="#" aria-label="Feedback">Feedback</a>
+		<button id="loginBtn" aria-haspopup="dialog">Login</button>
+		<button id="logoutBtn" style="display:none;" aria-hidden="true">Logout</button>
+	</div>
+</header>
+
+<!-- Floating Offer Line -->
+<div class="announcement-bar" role="region" aria-label="Site announcements">
+	<span>🎉 Grand Opening on 1st Nov 2025 | 🥳 Offer: Get 20% OFF on Your First Order! 🥳 & 🚚 Free Delivery | 🕒 Kitchen Opens 11 AM to 9 PM | 🍔 Order Now!</span>
+	</div>
+
+<div class="main">
+	<aside>
+		<div class="nav-item active" data-tab="featured" onclick="switchCategory('featured')">🍛 Featured</div>
+		<div class="nav-item" data-tab="chicken" onclick="switchCategory('chicken')">🍗 Chicken</div>
+		<div class="nav-item" data-tab="mutton" onclick="switchCategory('mutton')">🍖 Mutton</div>
+		<div class="nav-item" data-tab="fish" onclick="switchCategory('fish')">🐟 Fish</div>
+		<div class="nav-item" data-tab="dal" onclick="switchCategory('dal')">🍲 DAL</div>
+		<div class="nav-item" data-tab="rice" onclick="switchCategory('rice')">🍚 Rice</div>
+		<div class="nav-item" data-tab="breads" onclick="switchCategory('breads')">🌕 Breads</div>
+		<div class="nav-item" data-tab="snacks" onclick="switchCategory('snacks')">🍟 Snacks</div>
+		<div class="nav-item" data-tab="drinks" onclick="switchCategory('drinks')">🥤 Drinks</div>
+
+		<div class="catering" aria-labelledby="cateringTitle" style="margin-top:8px;">
+			<div id="cateringTitle" style="font-weight:800;color:var(--dark)">For Bulk Order</div>
+			<div class="small" style="margin-bottom:8px">We provide full event catering — Your Menu & Our Service.</div>
+			<a href="maacaterer.html" class="small" style="text-decoration:none;background:linear-gradient(90deg,var(--bg1),var(--bg2));padding:6px 10px;border-radius:999px;color:white;font-weight:800">MAA Caterer →</a>
+		</div>
+	</aside>
+
+	<main>
+		<h2 id="sectionTitle">Featured Dishes</h2>
+		<div class="cards-grid" id="cardsGrid" role="list"></div>
+	</main>
+</div>
+
+<footer>
+	<div class="footer-content">
+		<span class="copyright">
+			<div>© 2025 Petuk First — All Rights Reserved.</div>
+		</span>
+		<a href="kitchen.html" aria-label="Kitchen">☕︎</a>
+		<div class="social-icons" role="navigation" aria-label="Social links">
+			<a href="https://facebook.com/petukfirst" aria-label="Facebook">ⓕ</a>
+			<a href="#" aria-label="Instagram">🅾</a>
+			<a href="#" aria-label="YouTube">[ ▶︎ ]</a>
+			<a href="#" aria-label="Payment Method">💳</a>
+		</div>
+	</div>
+</footer>
+
+<div class="cart-toggle" id="cartToggle" role="button" aria-expanded="false" aria-controls="cartPanel">🛒 <span id="cartCount">0</span> Items</div>
+<div class="cart-panel" id="cartPanel" aria-hidden="true">
+	<h3>Your Cart</h3>
+	<div class="cart-items" id="cartItems">
+		<p style="text-align:center;color:#999;">Your cart is empty.</p>
+	</div>
+	<div class="cart-summary">
+		<div>Subtotal: <span id="subtotal">₹0</span></div>
+		<div>Delivery: <span id="delivery">₹0</span></div>
+		<div><b>Total: <span id="total">₹0</span></b></div>
+		<div class="offer-text" id="offerText"></div>
+		<button class="btn" style="width:100%;margin-top:8px;" onclick="placeOrder()">Place Order on WhatsApp</button>
+	</div>
+</div>
+
+<!-- Custom Toast Notification Container -->
+<div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Login Modal -->
+<div class="modal" id="loginModal" role="dialog" aria-modal="true" aria-hidden="true">
+	<div class="modal-content" role="document">
+		<h3>Login</h3>
+		<form id="loginForm">
+			<input type="text" id="loginId" placeholder="Email or Mobile No" required>
+			<input type="password" id="loginPassword" placeholder="Password" required>
+			<button type="submit" class="btn" style="width:100%">Login</button>
+			<p id="loginError" style="color:var(--primary);text-align:center;font-size:14px;margin-top:8px;"></p>
+		</form>
+		<div class="modal-footer">
+			<p>Don't have an account? <a href="#" id="openSignup">Sign Up</a></p>
+			<div class="policy-links">
+				<a href="privacy.html" target="_blank">Privacy Policy</a> |
+				<a href="terms.html" target="_blank">Terms &amp; Conditions</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Signup Modal -->
+<div class="modal" id="signupModal" role="dialog" aria-modal="true" aria-hidden="true">
+	<div class="modal-content" role="document">
+		<h3>Sign Up</h3>
+		<form id="signupForm">
+			<input type="text" id="signupName" placeholder="Full Name" required>
+			<input type="email" id="signupEmail" placeholder="Email" required>
+			<input type="text" id="signupMobile" placeholder="Mobile No" required>
+			<input type="password" id="signupPassword" placeholder="Password (Min 8 Chars)" required>
+			<input type="password" id="signupConfirmPassword" placeholder="Confirm Password" required>
+			<input type="text" id="signupAddress" placeholder="Delivery Address" required>
+			<input type="text" id="signupPincode" placeholder="Pin Code" required>
+			<button type="submit" class="btn" style="width:100%">Sign Up</button>
+			<p id="signupError" style="color:var(--primary);text-align:center;font-size:14px;margin-top:8px;"></p>
+		</form>
+		<div class="modal-footer">
+			<p>Already have an account? <a href="#" id="openLogin">Login</a></p>
+		</div>
+	</div>
+</div>
+
+<script type="module">
+	// PocketBase client library (ES module)
+	import PocketBase from "https://cdn.jsdelivr.net/npm/pocketbase@0.21.3/dist/pocketbase.es.js";
+
+	// ------------ CONFIG ------------
+	// Change to your PocketBase URL (must be accessible from the browser)
+	const PB_URL = "http://127.0.0.1:8090";
+	const pb = new PocketBase(PB_URL);
+
+	// WhatsApp number (no plus sign). Replace with your number if needed.
+	const WA_NUMBER = "919474104010";
+
+	// ------------ UI refs ------------
+	const ui = {
+		loginBtn: document.getElementById('loginBtn'),
+		logoutBtn: document.getElementById('logoutBtn'),
+		loginModal: document.getElementById('loginModal'),
+		signupModal: document.getElementById('signupModal'),
+		openSignup: document.getElementById('openSignup'),
+		openLogin: document.getElementById('openLogin'),
+		cardsGrid: document.getElementById('cardsGrid'),
+		sectionTitleEl: document.getElementById('sectionTitle'),
+		cartPanel: document.getElementById('cartPanel'),
+		cartToggle: document.getElementById('cartToggle'),
+		cartCount: document.getElementById('cartCount'),
+		cartItems: document.getElementById('cartItems'),
+		subtotal: document.getElementById('subtotal'),
+		delivery: document.getElementById('delivery'),
+		total: document.getElementById('total'),
+		offerText: document.getElementById('offerText'),
+		loginError: document.getElementById('loginError'),
+		signupError: document.getElementById('signupError')
+	};
+
+	let CURRENT_CATEGORY = 'featured';
+	let currentMenuDocs = [];
+	let cart = [];
+
+	// ------------ Utilities ------------
+	function showToast(message, duration = 3000) {
+		const container = document.getElementById('toastContainer');
+		const toast = document.createElement('div');
+		toast.className = 'toast';
+		toast.textContent = message;
+		container.appendChild(toast);
+		// animate in
+		setTimeout(() => toast.classList.add('show'), 10);
+		// remove later
+		setTimeout(() => {
+			toast.classList.remove('show');
+			setTimeout(() => { if (toast.parentNode) container.removeChild(toast); }, 300);
+		}, duration);
+	}
+
+	function escapeHtml(str) {
+		return String(str || '').replace(/[&<>"']/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s]));
+	}
+	function escapeJS(str) {
+		return String(str || '').replace(/'/g, "\\'");
+	}
+
+	// ------------ Auth state handling ------------
+	pb.authStore.onChange(() => {
+		const user = pb.authStore.model;
+		if (user) {
+			const displayName = user.name || (user.email ? user.email.split('@')[0] : 'User');
+			ui.logoutBtn.textContent = `Hi, ${displayName} — Logout`;
+			ui.logoutBtn.style.display = 'inline-block';
+			ui.logoutBtn.setAttribute('aria-hidden', 'false');
+			ui.loginBtn.style.display = 'none';
+		} else {
+			ui.loginBtn.style.display = 'inline-block';
+			ui.logoutBtn.style.display = 'none';
+			ui.logoutBtn.setAttribute('aria-hidden', 'true');
+		}
+	});
+
+	// ------------ UI interactions ------------
+	ui.cartToggle.addEventListener('click', () => {
+		const open = ui.cartPanel.classList.toggle('open');
+		ui.cartToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+		ui.cartPanel.setAttribute('aria-hidden', open ? 'false' : 'true');
+	});
+
+	ui.loginBtn.addEventListener('click', () => {
+		ui.loginModal.style.display = 'flex';
+		ui.loginModal.setAttribute('aria-hidden', 'false');
+	});
+	ui.logoutBtn.addEventListener('click', () => {
+		pb.authStore.clear();
+		showToast('You have been logged out successfully.');
+	});
+
+	ui.openSignup.addEventListener('click', e => {
+		e.preventDefault();
+		ui.loginModal.style.display = 'none';
+		ui.loginModal.setAttribute('aria-hidden', 'true');
+		ui.signupModal.style.display = 'flex';
+		ui.signupModal.setAttribute('aria-hidden', 'false');
+		ui.signupError.textContent = '';
+	});
+	ui.openLogin.addEventListener('click', e => {
+		e.preventDefault();
+		ui.signupModal.style.display = 'none';
+		ui.signupModal.setAttribute('aria-hidden', 'true');
+		ui.loginModal.style.display = 'flex';
+		ui.loginModal.setAttribute('aria-hidden', 'false');
+		ui.loginError.textContent = '';
+	});
+
+	// click outside modal to close
+	window.addEventListener('click', e => {
+		if (e.target === ui.loginModal) { ui.loginModal.style.display = 'none'; ui.loginModal.setAttribute('aria-hidden', 'true'); }
+		if (e.target === ui.signupModal) { ui.signupModal.style.display = 'none'; ui.signupModal.setAttribute('aria-hidden', 'true'); }
+	});
+
+	// ------------ PocketBase auth flows ------------
+	document.getElementById('loginForm').addEventListener('submit', async e => {
+		e.preventDefault();
+		ui.loginError.textContent = '';
+		const id = document.getElementById('loginId').value.trim();
+		const password = document.getElementById('loginPassword').value.trim();
+		try {
+			// pb.collection('users').authWithPassword accepts (email, password)
+			// If you support login by mobile number, you'll need server-side adapter or store mobile as username.
+			await pb.collection('users').authWithPassword(id, password);
+			ui.loginModal.style.display = 'none';
+			ui.loginModal.setAttribute('aria-hidden', 'true');
+			showToast('Login successful! Welcome back.');
+		} catch (err) {
+			ui.loginError.textContent = 'Login failed. Check your credentials.';
+			console.error('Login error:', err);
+		}
+	});
+
+	document.getElementById('signupForm').addEventListener('submit', async e => {
+		e.preventDefault();
+		ui.signupError.textContent = '';
+		const name = document.getElementById('signupName').value.trim();
+		const email = document.getElementById('signupEmail').value.trim();
+		const mobile = document.getElementById('signupMobile').value.trim();
+		const password = document.getElementById('signupPassword').value.trim();
+		const confirm = document.getElementById('signupConfirmPassword').value.trim();
+		const address = document.getElementById('signupAddress').value.trim();
+		const pincode = document.getElementById('signupPincode').value.trim();
+
+		if (password !== confirm) {
+			ui.signupError.textContent = 'Passwords do not match';
+			return;
+		}
+
+		try {
+			// create a user record. Ensure your users collection allows public create or adjust accordingly.
+			await pb.collection('users').create({
+				email,
+				password,
+				passwordConfirm: confirm,
+				name,
+				mobile,
+				address,
+				pin: pincode
+			});
+			showToast('Sign up successful! Please log in now.', 5000);
+			ui.signupModal.style.display = 'none';
+			ui.signupModal.setAttribute('aria-hidden', 'true');
+			ui.loginModal.style.display = 'flex';
+			ui.loginModal.setAttribute('aria-hidden', 'false');
+		} catch (err) {
+			ui.signupError.textContent = 'Signup failed. Check fields and ensure email is unique.';
+			console.error('Signup error:', err);
+		}
+	});
+
+	// ------------ MENU (PocketBase fetch) ------------
+	async function fetchAndRenderMenu() {
+		ui.cardsGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;">Loading menu...</p>';
+		try {
+			// adapt collection name to your PB instance (you mentioned petuk_menu or kitchen)
+			const records = await pb.collection('kitchen').getFullList({
+				sort: 'category,name',
+				filter: 'available = true'
+			});
+			currentMenuDocs = records;
+			renderMenu(records);
+		} catch (err) {
+			ui.cardsGrid.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:#ff6347;">Error loading menu. Please check that the PocketBase server is running and accessible at ${PB_URL}.</p>`;
+			console.error('Menu fetch error:', err);
+		}
+	}
+
+	function renderMenu(list = []) {
+		const filtered = list.filter(item => {
+			const catField = (item.category || '').toString().toLowerCase();
+			if (CURRENT_CATEGORY === 'featured') return catField.includes('featured');
+			return catField.includes(CURRENT_CATEGORY);
+		});
+
+		ui.cardsGrid.innerHTML = filtered.length ? filtered.map(item => {
+			// Build image URL in a robust way:
+			let imgUrl = 'https://placehold.co/300x140/cccccc/333333?text=PetukFirst';
+			try {
+				if (item.image) {
+					// item.image may be an array of filenames or a single filename string
+					if (Array.isArray(item.image) && item.image.length > 0) {
+						imgUrl = pb.getFileUrl(item, 'image', item.image[0], { thumb: '300x140' });
+					} else if (typeof item.image === 'string') {
+						// if image stored as filename string
+						imgUrl = pb.getFileUrl(item, 'image', item.image, { thumb: '300x140' });
+					}
+				}
+			} catch (e) {
+				console.warn('Image URL generation error for item', item.id, e);
+			}
+
+			const priceNum = Number(item.price);
+			const priceDisplay = !Number.isNaN(priceNum) ? priceNum.toFixed(2) : 'N/A';
+
+			// Use data-id attributes and safe escaping for inline handlers
+			return `
+			<div class="card" role="listitem">
+				<img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(item.name || 'Menu item')}" onerror="this.onerror=null;this.src='https://placehold.co/300x140/cccccc/333333?text=No+Image';">
+				<div class="card-body">
+					<div>
+						<div class="card-title">${escapeHtml(item.name || 'Unnamed')}</div>
+						<div class="card-desc">${escapeHtml(item.description || 'A delicious item from our kitchen.')}</div>
+					</div>
+					<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+						<div class="card-price">₹${escapeHtml(priceDisplay)}</div>
+						<button class="btn" data-id="${escapeHtml(item.id)}" onclick="addToCart('${escapeJS(item.id)}')">Add to Cart</button>
+					</div>
+				</div>
+			</div>`;
+		}).join('') : '<p style="grid-column:1/-1;text-align:center;color:#999;">No items found in this category. Check back soon!</p>';
+	}
+
+	// Switch categories
+	window.switchCategory = function(cat) {
+		CURRENT_CATEGORY = cat;
+		document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.tab === cat));
+		const titleMap = {
+			featured: 'Featured Dishes',
+			chicken: 'Chicken Specialties',
+			mutton: 'Mutton Delights',
+			fish: 'Fish Specialties',
+			dal: 'Dal Specialties',
+			rice: 'Rice Specialties',
+			breads: 'Breads Specialties',
+			snacks: 'Quick Bites & Snacks',
+			drinks: 'Refreshing Beverages'
+		};
+		ui.sectionTitleEl.textContent = titleMap[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
+		renderMenu(currentMenuDocs);
+
+		const activeEl = document.querySelector(`.nav-item[data-tab="${cat}"]`);
+		if (activeEl && window.innerWidth <= 768) {
+			activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+		}
+	};
+
+	// ------------ CART logic ------------
+	window.addToCart = function(id) {
+		// require login to add to cart
+		if (!pb.authStore.isValid) {
+			showToast('Please login first to add items to your cart!');
+			return;
+		}
+		const item = currentMenuDocs.find(x => x.id === id);
+		if (!item) return;
+		const price = Number(item.price) || 0;
+		if (price === 0) {
+			showToast('This item has no price set.');
+			return;
+		}
+		const exist = cart.find(x => x.id === id);
+		if (exist) {
+			exist.qty++;
+		} else {
+			cart.push({ id: item.id, name: item.name, price: price, qty: 1 });
+		}
+		renderCart();
+		showToast(`${item.name} added to cart!`);
+	};
+
+	window.changeQty = function(id, delta) {
+		const item = cart.find(x => x.id === id);
+		if (!item) return;
+		item.qty += delta;
+		if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+		renderCart();
+	};
+
+	function renderCart() {
+		const subtotalNum = cart.reduce((sum, x) => sum + (Number(x.price) || 0) * x.qty, 0);
+		const deliveryFee = subtotalNum > 0 && subtotalNum < 249 ? 30 : 0;
+		const totalNum = subtotalNum + deliveryFee;
+		const totalItems = cart.reduce((sum, x) => sum + x.qty, 0);
+
+		ui.cartItems.innerHTML = cart.length > 0 ? cart.map(x => `
+			<div class="cart-item">
+				<span>${escapeHtml(x.name)}</span>
+				<div class="qty-controls" role="group" aria-label="Quantity controls">
+					<button onclick="changeQty('${escapeJS(x.id)}', -1)" aria-label="Decrease quantity">-</button>
+					<span style="font-weight:600;">${x.qty}</span>
+					<button onclick="changeQty('${escapeJS(x.id)}', 1)" aria-label="Increase quantity">+</button>
+				</div>
+			</div>`).join('') : '<p style="text-align:center;color:#999;">Your cart is empty.</p>';
+
+		ui.cartCount.textContent = totalItems;
+		ui.subtotal.textContent = `₹${subtotalNum.toFixed(2)}`;
+		ui.delivery.textContent = deliveryFee > 0 ? `₹${deliveryFee.toFixed(2)}` : 'FREE';
+		ui.total.textContent = `₹${totalNum.toFixed(2)}`;
+
+		if (subtotalNum === 0) ui.offerText.textContent = '';
+		else if (subtotalNum < 249) ui.offerText.textContent = `Add ₹${(249 - subtotalNum).toFixed(2)} more for FREE delivery!`;
+		else if (subtotalNum >= 999) ui.offerText.textContent = '🎉 Congrats! You get a 750ml Cold Drink FREE!';
+		else ui.offerText.textContent = 'Delivery is FREE on this order!';
+
+		// Auto-open / close on desktop for convenience
+		if (cart.length > 0 && window.innerWidth > 768 && !ui.cartPanel.classList.contains('open')) {
+			ui.cartPanel.classList.add('open');
+			ui.cartPanel.setAttribute('aria-hidden', 'false');
+			ui.cartToggle.setAttribute('aria-expanded', 'true');
+		}
+		if (cart.length === 0 && ui.cartPanel.classList.contains('open') && window.innerWidth > 768) {
+			ui.cartPanel.classList.remove('open');
+			ui.cartPanel.setAttribute('aria-hidden', 'true');
+			ui.cartToggle.setAttribute('aria-expanded', 'false');
+		}
+	}
+
+	// ------------ Place order via WhatsApp ------------
+	window.placeOrder = function() {
+		if (!pb.authStore.isValid) {
+			showToast('Please login first to place an order!');
+			return;
+		}
+		if (cart.length === 0) {
+			showToast('Your cart is empty!');
+			return;
+		}
+
+		const user = pb.authStore.model || {};
+		// Ensure these fields exist in your users collection: name, mobile, address
+		if (!user.address || !user.name || !user.mobile) {
+			showToast('Please complete your profile details (Name, Mobile, Address) to place an order.');
+			return;
+		}
+
+		const subtotalNum = cart.reduce((sum, x) => sum + (Number(x.price) || 0) * x.qty, 0);
+		const deliveryFee = subtotalNum < 249 ? 30 : 0;
+		const totalNum = subtotalNum + deliveryFee;
+
+		const orderItems = cart.map(x => `* ${x.qty}x ${x.name} (₹${(x.price * x.qty).toFixed(2)})`).join('\n');
+
+		const messageText =
+			`*NEW ORDER FROM PETUK FIRST*\n\n` +
+			`*Customer Details:*\n` +
+			`Name: ${user.name}\n` +
+			`Mobile: ${user.mobile || user.email}\n` +
+			`Address: ${user.address}\n` +
+			(user.pin ? `Pin: ${user.pin}\n\n` : '\n') +
+			`*Order Items:*\n` +
+			`${orderItems}\n\n` +
+			`*Payment Summary:*\n` +
+			`Subtotal: ₹${subtotalNum.toFixed(2)}\n` +
+			`Delivery: ${deliveryFee > 0 ? '₹' + deliveryFee.toFixed(2) : 'FREE'}\n` +
+			`*TOTAL: ₹${totalNum.toFixed(2)}*\n\n` +
+			`Please confirm the order and arrange delivery.`;
+
+		const encoded = encodeURIComponent(messageText);
+		// open WhatsApp (web or app depending on platform)
+		window.open(`https://wa.me/${WA_NUMBER}?text=${encoded}`, '_blank');
+
+		// Clear cart after sending (you might want to preserve it until confirmed)
+		cart = [];
+		renderCart();
+		showToast('Order details sent to WhatsApp! Please confirm via WhatsApp.', 5000);
+	};
+
+	// ------------ Initialization ------------
+	// initial UI update (authStore.onChange will update when user is signed in)
+	renderCart();
+	fetchAndRenderMenu();
+
+	// Optional: keyboard toggle for cart (press 'c')
+	window.addEventListener('keydown', (e) => {
+		if (e.key.toLowerCase() === 'c') {
+			ui.cartToggle.click();
+		}
+	});
+</script>
+
+</body>
+</html>
